@@ -7,11 +7,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.taskscheduler.ui.theme.TaskSchedulerTheme
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.NavHost
+import com.example.taskscheduler.ui.screens.MainScreen
+import com.example.taskscheduler.ui.screens.StatisticScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,8 +31,49 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TaskScheduler() {
-    //val navController = rememberNavController()
+    val navController = rememberNavController()
+
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+    ) { innerPadding ->
+        AppNavHost(
+            navController = navController,
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
 }
+
+@Composable
+fun AppNavHost(
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+) {
+
+    NavHost(
+        navController = navController,
+        startDestination = "main",
+        modifier = modifier
+    ) {
+
+        composable("main") {
+            MainScreen(
+                onNavigateToStatistic = {
+                    navController.navigate("statistic")
+                }
+            )
+        }
+
+        composable("statistic") {
+            StatisticScreen(
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+    }
+}
+
 
 
 
