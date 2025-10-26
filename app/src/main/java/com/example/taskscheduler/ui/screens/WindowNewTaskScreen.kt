@@ -57,8 +57,6 @@ fun WindowNewTaskScreen(
 
 fun saveTask() {}
 
-
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun WindowNewTaskScreenPreview() {
