@@ -26,7 +26,7 @@ fun WindowNewTaskScreen(
             .padding(bottom = 35.dp)
             .statusBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom
+        verticalArrangement = Arrangement.Bottom,
     ) {
         GeneralButton(
             onClick = {
