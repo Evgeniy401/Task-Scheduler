@@ -6,7 +6,11 @@ data class Task(
     val id: Int,
     val title: String,
     val body: String,
-    val status: Boolean,
+    val priority: Priority,
 )
 
 val listTask: MutableList<Task> = mutableListOf()
+
+enum class Priority{
+    STANDARD, HIGH, MAXIMUM
+}
