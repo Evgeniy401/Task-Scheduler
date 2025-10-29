@@ -48,7 +48,7 @@ fun WindowNewTaskScreen(
                 viewModel.updateTextLabel(newTextLabel)
             },
             shape = RoundedCornerShape(10.dp),
-            label = {Text(text = "Название задачи")},
+            label = {Text(text = "Содержание задачи")},
             singleLine = true,
         )
 

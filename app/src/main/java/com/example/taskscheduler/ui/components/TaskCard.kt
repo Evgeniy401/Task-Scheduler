@@ -2,11 +2,14 @@ package com.example.taskscheduler.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +23,10 @@ import androidx.compose.ui.unit.dp
 import com.example.taskscheduler.domain.model.Priority
 import com.example.taskscheduler.domain.model.Task
 import com.example.taskscheduler.R
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+
 
 val task1 = Task(
     id = 1,
@@ -59,28 +66,45 @@ fun TaskCard(task: Task) {
                     .padding(top = 10.dp)
             )
 
-            Text(modifier = Modifier
-                .padding(horizontal = 8.dp),
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp),
                 text = task.body,
                 textAlign = TextAlign.Justify,
                 style = MaterialTheme.typography.bodyMedium
             )
 
-            Spacer(
-                modifier = Modifier
-                    .padding(top = 10.dp)
-            )
+            Row() {
 
-            Text(
-                modifier = Modifier
-                    .padding(bottom = 10.dp),
-                text = when (task.priority) {
-                    Priority.STANDARD -> stringResource(R.string.priority_standard)
-                    Priority.HIGH -> stringResource(R.string.priority_high)
-                    Priority.MAXIMUM -> stringResource(R.string.priority_maximum)
-                },
-                style = MaterialTheme.typography.bodyLarge,
-            )
+                IconButton(
+                    onClick = { /* действие при клике */ }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Check,
+                        contentDescription = "Описание для доступности"
+                    )
+                }
+
+                Text(
+                    modifier = Modifier
+                        .padding(bottom = 10.dp),
+                    text = when (task.priority) {
+                        Priority.STANDARD -> stringResource(R.string.priority_standard)
+                        Priority.HIGH -> stringResource(R.string.priority_high)
+                        Priority.MAXIMUM -> stringResource(R.string.priority_maximum)
+                    },
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+
+                IconButton(
+                    onClick = { /* действие при клике */ }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = "Описание для доступности"
+                    )
+                }
+            }
         }
     }
 }
