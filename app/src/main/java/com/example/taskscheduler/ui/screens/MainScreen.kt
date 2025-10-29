@@ -25,6 +25,7 @@ import com.example.taskscheduler.ui.theme.TaskSchedulerTheme
 @Composable
 fun MainScreen(
     onNavigateToStatistic: () -> Unit,
+    onNavigateToWindowNewTask: () -> Unit,
 ) {
 
     Scaffold(
@@ -45,6 +46,7 @@ fun MainScreen(
                 ) {
                     GeneralButton(
                         onClick = {
+                            onNavigateToWindowNewTask()
                         }
                     ) {
                         Text(
@@ -95,7 +97,8 @@ fun TaskList(
 fun MainScreenPreview() {
     TaskSchedulerTheme() {
         MainScreen(
-            onNavigateToStatistic = {}
+            onNavigateToStatistic = {},
+            onNavigateToWindowNewTask = {}
         )
     }
 }
