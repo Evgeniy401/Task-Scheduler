@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.NavHost
 import com.example.taskscheduler.ui.screens.MainScreen
 import com.example.taskscheduler.ui.screens.StatisticScreen
+import com.example.taskscheduler.ui.screens.WindowNewTaskScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +61,11 @@ fun AppNavHost(
             MainScreen(
                 onNavigateToStatistic = {
                     navController.navigate("statistic")
-                }
+                },
+
+                onNavigateToWindowNewTask = {
+                    navController.navigate("newTask")
+                },
             )
         }
 
@@ -69,6 +74,18 @@ fun AppNavHost(
                 onBack = {
                     navController.popBackStack()
                 }
+            )
+        }
+
+        composable("newTask") {
+            WindowNewTaskScreen(
+                saveNewTask = {
+
+                },
+
+                onBack = {
+                    navController.popBackStack()
+                },
             )
         }
     }
