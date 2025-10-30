@@ -6,14 +6,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -23,10 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.example.taskscheduler.domain.model.Priority
 import com.example.taskscheduler.domain.model.Task
 import com.example.taskscheduler.R
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-
+import androidx.compose.ui.Alignment
 
 val task1 = Task(
     id = 1,
@@ -61,33 +57,23 @@ fun TaskCard(task: Task) {
                 style = MaterialTheme.typography.headlineSmall,
             )
 
-            Spacer(
-                modifier = Modifier
-                    .padding(top = 10.dp)
-            )
-
             Text(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = 5.dp),
                 text = task.body,
                 textAlign = TextAlign.Justify,
                 style = MaterialTheme.typography.bodyMedium
             )
 
-            Row() {
-
-                IconButton(
-                    onClick = { /* действие при клике */ }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Check,
-                        contentDescription = "Описание для доступности"
-                    )
-                }
+            Column(
+                modifier = Modifier
+                    .padding(bottom = 8.dp, top = 3.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
                 Text(
                     modifier = Modifier
-                        .padding(bottom = 10.dp),
+                        .padding(bottom = 5.dp),
                     text = when (task.priority) {
                         Priority.STANDARD -> stringResource(R.string.priority_standard)
                         Priority.HIGH -> stringResource(R.string.priority_high)
@@ -96,13 +82,31 @@ fun TaskCard(task: Task) {
                     style = MaterialTheme.typography.bodyLarge,
                 )
 
-                IconButton(
-                    onClick = { /* действие при клике */ }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = "Описание для доступности"
+                Row {
+                    GeneralButton(
+                        modifier = Modifier
+                            .width(150.dp),
+                        onClick = {},
+                    ) {
+                        Text(
+                            text = "Выполнить "
+                        )
+                    }
+
+                    Spacer(
+                        modifier = Modifier
+                            .padding(start = 10.dp)
                     )
+
+                    GeneralButton(
+                        modifier = Modifier
+                            .width(150.dp),
+                        onClick = {}
+                    ) {
+                        Text(
+                            text = "Отменить "
+                        )
+                    }
                 }
             }
         }
