@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.asStateFlow
 class WindowNewTaskScreenViewModel : ViewModel() {
 
     private val _textStateLabel = MutableStateFlow("")
-    val textStateLabel = _textStateLabel.asStateFlow()
+    val textStateLabel = _textStateLabel
 
     private val _textStateDescription = MutableStateFlow("")
-    val textStateDescription = _textStateDescription.asStateFlow()
+    val textStateDescription = _textStateDescription
 
     fun updateTextLabel(newTextLabel: String) {
         _textStateLabel.value = newTextLabel
