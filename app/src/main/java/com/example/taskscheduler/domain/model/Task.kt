@@ -1,12 +1,12 @@
 package com.example.taskscheduler.domain.model
 
-data class TaskDomainModel(
+data class Task(
     val id: Int,
     val title: String,
     val body: String,
-    val priority: Priority,
+    val priorityDomain: PriorityDomain,
 )
 
-enum class Priority{
+enum class PriorityDomain{
     STANDARD, HIGH, MAXIMUM, NONE
 }

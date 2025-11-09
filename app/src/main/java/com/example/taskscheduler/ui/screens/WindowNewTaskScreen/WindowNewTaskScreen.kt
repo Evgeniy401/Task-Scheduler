@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.taskscheduler.domain.model.Priority
+import com.example.taskscheduler.domain.model.PriorityDomain
 import com.example.taskscheduler.ui.components.GeneralButton
 import com.example.taskscheduler.ui.theme.TaskSchedulerTheme
 import com.example.taskscheduler.R
@@ -42,16 +42,16 @@ import com.example.taskscheduler.domain.utils.getPriorityText
 
 @Composable
 fun WindowNewTaskScreen(
-    saveNewTask: (String, String, Priority) -> Unit,
+    saveNewTask: (String, String, PriorityDomain) -> Unit,
     onBack: () -> Unit,
     viewModel: WindowNewTaskScreenViewModel = viewModel()
 ) {
     val textStateLabel by viewModel.textStateLabel.collectAsState()
     val textStateBody by viewModel.textStateDescription.collectAsState()
     var isExpanded by remember { mutableStateOf(false) }
-    var selectedPriority by remember { mutableStateOf(Priority.NONE) }
+    var selectedPriorityDomain by remember { mutableStateOf(PriorityDomain.NONE) }
 
-    val priorities = Priority.entries.toTypedArray().filter { it != Priority.NONE }
+    val priorities = PriorityDomain.entries.toTypedArray().filter { it != PriorityDomain.NONE }
 
     Column(
         modifier = Modifier
@@ -97,7 +97,7 @@ fun WindowNewTaskScreen(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
-                    text = "Приоритет: ${getPriorityText(selectedPriority)}"
+                    text = "Приоритет: ${getPriorityText(selectedPriorityDomain)}"
                 )
                 Icon(
                     imageVector =
@@ -118,7 +118,7 @@ fun WindowNewTaskScreen(
                 priorities.forEach { priority ->
                     DropdownMenuItem(
                         onClick = {
-                            selectedPriority = priority
+                            selectedPriorityDomain = priority
                             isExpanded = false
                         },
                         text = {
@@ -145,8 +145,8 @@ fun WindowNewTaskScreen(
         ) {
             GeneralButton(
                 onClick = {
-                    if (selectedPriority != Priority.NONE && textStateLabel.isNotBlank()) {
-                        saveNewTask(textStateLabel, textStateBody, selectedPriority)
+                    if (selectedPriorityDomain != PriorityDomain.NONE && textStateLabel.isNotBlank()) {
+                        saveNewTask(textStateLabel, textStateBody, selectedPriorityDomain)
                         onBack()
                     } // добавить проверку с Snackbar
                 }
