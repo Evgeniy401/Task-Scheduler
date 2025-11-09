@@ -1,7 +1,6 @@
 package com.example.taskscheduler.data.storage
 
 import com.example.taskscheduler.domain.model.Task
-import com.example.taskscheduler.domain.model.TaskDomainModel
 
 private val tasks = mutableListOf<Task>() // временное хранилище данных в памяти
 private var nextId = 1
@@ -16,7 +15,7 @@ class TaskStorageImpl: TaskStorage {
         tasks.removeAt(taskId)
     }
 
-    private fun mapToTaskData(task: TaskDomainModel) {
+    private fun mapToTaskData(task: Task) {
         return
     }
 

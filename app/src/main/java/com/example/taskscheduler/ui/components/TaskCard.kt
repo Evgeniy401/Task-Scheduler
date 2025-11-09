@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.taskscheduler.domain.model.Priority
+import com.example.taskscheduler.domain.model.PriorityDomain
 import com.example.taskscheduler.domain.model.Task
 import com.example.taskscheduler.R
 import androidx.compose.ui.Alignment
@@ -27,7 +27,7 @@ val task1 = Task(
     id = 1,
     title = "Помыть машину",
     body = "Это очень длинное описание задачи, которое занимает несколько строк и должно автоматически увеличивать высоту карточки в зависимости от объема текста",
-    priority = Priority.STANDARD
+    priority = PriorityDomain.STANDARD
 )
 
 @Composable
@@ -39,10 +39,10 @@ fun TaskCard(task: Task) {
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = when (task.priority) {
-                Priority.NONE -> Color(0xFFF5F5F5)
-                Priority.STANDARD -> Color(0xFFE8F5E8)
-                Priority.HIGH -> Color(0xFFFFF9C4)
-                Priority.MAXIMUM -> Color(0xFFFFEBEE)
+                PriorityDomain.NONE -> Color(0xFFF5F5F5)
+                PriorityDomain.STANDARD -> Color(0xFFE8F5E8)
+                PriorityDomain.HIGH -> Color(0xFFFFF9C4)
+                PriorityDomain.MAXIMUM -> Color(0xFFFFEBEE)
             }
         )
     ) {
@@ -75,10 +75,10 @@ fun TaskCard(task: Task) {
                     modifier = Modifier
                         .padding(bottom = 5.dp),
                     text = when (task.priority) {
-                        Priority.NONE -> stringResource(R.string.priority_standard)
-                        Priority.STANDARD -> stringResource(R.string.priority_standard)
-                        Priority.HIGH -> stringResource(R.string.priority_high)
-                        Priority.MAXIMUM -> stringResource(R.string.priority_maximum)
+                        PriorityDomain.NONE -> stringResource(R.string.priority_standard)
+                        PriorityDomain.STANDARD -> stringResource(R.string.priority_standard)
+                        PriorityDomain.HIGH -> stringResource(R.string.priority_high)
+                        PriorityDomain.MAXIMUM -> stringResource(R.string.priority_maximum)
                     },
                     style = MaterialTheme.typography.bodyLarge,
                 )
