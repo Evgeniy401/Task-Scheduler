@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">Task Scheduler</string>
-    <string name="priority_standard">Приоритет: стандартный</string>
-    <string name="priority_high">Приоритет: высокий</string>
-    <string name="priority_maximum">Приоритет: максммальный</string>
+    <string name="priority_none">не выбрано</string>
+    <string name="priority_standard">Стандартный</string>
+    <string name="priority_high">Высокий</string>
+    <string name="priority_maximum">Максммальный</string>
     <string name="open_menu">открыть меню</string>
 
 </resources>

@@ -1,10 +1,11 @@
-package com.example.taskscheduler.ui.screens
+package com.example.taskscheduler.ui.screens.WindowNewTaskScreen
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class WindowNewTaskScreenViewModel : ViewModel() {
+
+    var counter = 0
 
     private val _textStateLabel = MutableStateFlow("")
     val textStateLabel = _textStateLabel

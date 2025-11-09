@@ -1,4 +1,4 @@
-package com.example.taskscheduler.ui.screens
+package com.example.taskscheduler.ui.screens.MainScreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +21,8 @@ import com.example.taskscheduler.domain.model.Task
 import com.example.taskscheduler.ui.components.GeneralButton
 import com.example.taskscheduler.ui.components.TaskCard
 import com.example.taskscheduler.ui.theme.TaskSchedulerTheme
+
+val listTasks: MutableList<Task> = mutableListOf()
 
 @Composable
 fun MainScreen(

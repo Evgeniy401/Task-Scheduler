@@ -1,4 +1,4 @@
-package com.example.taskscheduler.ui.screens
+package com.example.taskscheduler.ui.screens.StatisticScreen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
