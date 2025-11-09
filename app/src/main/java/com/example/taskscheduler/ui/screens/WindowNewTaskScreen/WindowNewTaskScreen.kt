@@ -1,4 +1,4 @@
-package com.example.taskscheduler.ui.screens
+package com.example.taskscheduler.ui.screens.WindowNewTaskScreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -27,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,19 +38,20 @@ import com.example.taskscheduler.domain.model.Priority
 import com.example.taskscheduler.ui.components.GeneralButton
 import com.example.taskscheduler.ui.theme.TaskSchedulerTheme
 import com.example.taskscheduler.R
+import com.example.taskscheduler.domain.utils.getPriorityText
 
 @Composable
 fun WindowNewTaskScreen(
-    saveNewTask: () -> Unit,
+    saveNewTask: (String, String, Priority) -> Unit,
     onBack: () -> Unit,
     viewModel: WindowNewTaskScreenViewModel = viewModel()
 ) {
     val textStateLabel by viewModel.textStateLabel.collectAsState()
-    val textStateDescription by viewModel.textStateDescription.collectAsState()
+    val textStateBody by viewModel.textStateDescription.collectAsState()
     var isExpanded by remember { mutableStateOf(false) }
-    var selectedPriority by remember { mutableStateOf<Priority>(Priority.STANDARD) }
+    var selectedPriority by remember { mutableStateOf(Priority.NONE) }
 
-    val priorities = Priority.entries.toTypedArray()
+    val priorities = Priority.entries.toTypedArray().filter { it != Priority.NONE }
 
     Column(
         modifier = Modifier
@@ -71,7 +75,7 @@ fun WindowNewTaskScreen(
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth(),
-            value = textStateDescription,
+            value = textStateBody,
             onValueChange = { newTextDescription ->
                 viewModel.updateTextDescription(newTextDescription)
             },
@@ -82,17 +86,18 @@ fun WindowNewTaskScreen(
         Box(
             modifier = Modifier
                 .padding(top = 4.dp)
+                .wrapContentSize(Alignment.TopCenter),
         ) {
             Button(
                 onClick = {
                     isExpanded = !isExpanded
                 },
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .wrapContentWidth(),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
-                    text = getPriorityText(selectedPriority)
+                    text = "Приоритет: ${getPriorityText(selectedPriority)}"
                 )
                 Icon(
                     imageVector =
@@ -101,8 +106,32 @@ fun WindowNewTaskScreen(
                     contentDescription = stringResource(R.string.open_menu)
                 )
             }
+            DropdownMenu(
+                expanded = isExpanded,
+                onDismissRequest = {
+                    isExpanded = false
+                },
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .align(Alignment.Center),
+            ) {
+                priorities.forEach { priority ->
+                    DropdownMenuItem(
+                        onClick = {
+                            selectedPriority = priority
+                            isExpanded = false
+                        },
+                        text = {
+                            Text(
+                                text = getPriorityText(priority),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
+                    )
+                }
+            }
         }
-
         Spacer(
             modifier = Modifier.weight(1f)
         )
@@ -116,6 +145,10 @@ fun WindowNewTaskScreen(
         ) {
             GeneralButton(
                 onClick = {
+                    if (selectedPriority != Priority.NONE && textStateLabel.isNotBlank()) {
+                        saveNewTask(textStateLabel, textStateBody, selectedPriority)
+                        onBack()
+                    } // добавить проверку с Snackbar
                 }
             ) {
                 Text(
@@ -136,48 +169,17 @@ fun WindowNewTaskScreen(
                 )
             }
         }
-        DropdownMenu(
-            expanded = isExpanded,
-            onDismissRequest = {
-                isExpanded = false
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            priorities.forEach { priority ->
-                DropdownMenuItem(
-                    onClick = {
-                        selectedPriority = priority
-                        isExpanded = false
-                    },
-                    text = {
-                        Text(
-                            text = getPriorityText(priority)
-                        )
-                    }
-                )
-            }
-        }
     }
 }
 
-@Composable
-fun getPriorityText(priority: Priority): String {
-    val textPriority = when (priority) {
-        Priority.STANDARD -> stringResource(R.string.priority_standard)
-        Priority.HIGH -> stringResource(R.string.priority_high)
-        Priority.MAXIMUM -> stringResource(R.string.priority_maximum)
-    }
-    return textPriority
-}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun WindowNewTaskScreenPreview() {
-    TaskSchedulerTheme() {
+    TaskSchedulerTheme {
         WindowNewTaskScreen(
             onBack = {},
-            saveNewTask = {}
+            saveNewTask = { _, _, _ -> }
         )
     }
 }

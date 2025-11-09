@@ -39,6 +39,7 @@ fun TaskCard(task: Task) {
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = when (task.priority) {
+                Priority.NONE -> Color(0xFFF5F5F5)
                 Priority.STANDARD -> Color(0xFFE8F5E8)
                 Priority.HIGH -> Color(0xFFFFF9C4)
                 Priority.MAXIMUM -> Color(0xFFFFEBEE)
@@ -74,6 +75,7 @@ fun TaskCard(task: Task) {
                     modifier = Modifier
                         .padding(bottom = 5.dp),
                     text = when (task.priority) {
+                        Priority.NONE -> stringResource(R.string.priority_standard)
                         Priority.STANDARD -> stringResource(R.string.priority_standard)
                         Priority.HIGH -> stringResource(R.string.priority_high)
                         Priority.MAXIMUM -> stringResource(R.string.priority_maximum)

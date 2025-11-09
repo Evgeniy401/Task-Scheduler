@@ -2,13 +2,14 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    id("com.google.dagger.hilt.android")
+    id("com.google.devtools.ksp")
 }
 
 android {
     namespace = "com.example.taskscheduler"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.taskscheduler"
@@ -62,9 +63,14 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx.v280)
 
     implementation(libs.androidx.compose.material3.v120)
-
-
     implementation(libs.androidx.compose.material.icons.extended)
-
     implementation(libs.androidx.compose.material.icons.core)
+
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
+
+
 }

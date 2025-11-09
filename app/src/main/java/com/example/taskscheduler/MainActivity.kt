@@ -8,15 +8,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.taskscheduler.ui.theme.TaskSchedulerTheme
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.NavHost
-import com.example.taskscheduler.ui.screens.MainScreen
-import com.example.taskscheduler.ui.screens.StatisticScreen
-import com.example.taskscheduler.ui.screens.WindowNewTaskScreen
+import com.example.taskscheduler.data.repository.TaskRepositoryImpl
+import com.example.taskscheduler.domain.usecase.SaveTaskUseCase
+import com.example.taskscheduler.ui.screens.MainScreen.MainScreen
+import com.example.taskscheduler.ui.screens.StatisticScreen.StatisticScreen
+import com.example.taskscheduler.ui.screens.WindowNewTaskScreen.WindowNewTaskScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,6 +27,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TaskSchedulerTheme {
+                val taskRepository = remember { TaskRepositoryImpl() }
+                val saveTaskUseCase = remember { SaveTaskUseCase(taskRepository)
                 TaskScheduler()
             }
         }
@@ -31,7 +36,9 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun TaskScheduler() {
+fun TaskScheduler(
+    saveTaskUseCase: SaveTaskUseCase
+) {
     val navController = rememberNavController()
 
     Scaffold(
@@ -90,9 +97,3 @@ fun AppNavHost(
         }
     }
 }
-
-
-
-
-
-
