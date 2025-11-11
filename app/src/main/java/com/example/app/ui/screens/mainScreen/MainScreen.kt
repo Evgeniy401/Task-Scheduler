@@ -1,4 +1,4 @@
-package com.example.app.ui.screens.MainScreen
+package com.example.app.ui.screens.mainScreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -16,10 +17,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.app.domain.model.Task
 import com.example.app.ui.components.GeneralButton
 import com.example.app.ui.components.TaskCard
 import com.example.app.ui.theme.TaskSchedulerTheme
+import com.example.domain.model.Task
 
 val listTasks: MutableList<Task> = mutableListOf()
 

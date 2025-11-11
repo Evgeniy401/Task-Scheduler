@@ -34,11 +34,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.app.domain.model.PriorityDomain
 import com.example.app.ui.components.GeneralButton
 import com.example.app.ui.theme.TaskSchedulerTheme
 import com.example.app.R
-import com.example.app.domain.utils.getPriorityText
+import com.example.app.ui.utils.getPriorityText
+import com.example.domain.model.PriorityDomain
 
 @Composable
 fun WindowNewTaskScreen(
