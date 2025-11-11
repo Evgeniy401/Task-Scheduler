@@ -15,7 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.app.ui.theme.TaskSchedulerTheme
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.NavHost
-import com.example.app.ui.screens.MainScreen.MainScreen
+import com.example.app.ui.screens.mainScreen.MainScreen
 import com.example.app.ui.screens.StatisticScreen.StatisticScreen
 import com.example.app.ui.screens.WindowNewTaskScreen.WindowNewTaskScreen
 import com.example.data.repository.TaskRepositoryImpl
