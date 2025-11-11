@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Task Scheduler"
 include(":app")
- 
+include(":data")
+include(":domain")
