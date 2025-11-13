@@ -42,14 +42,14 @@ import com.example.domain.model.PriorityDomain
 
 @Composable
 fun WindowNewTaskScreen(
-    saveNewTask: (String, String, PriorityDomain) -> Unit,
     onBack: () -> Unit,
     viewModel: WindowNewTaskScreenViewModel = viewModel()
 ) {
     val textStateLabel by viewModel.textStateLabel.collectAsState()
     val textStateBody by viewModel.textStateDescription.collectAsState()
+    val selectedPriority by viewModel.selectedPriority.collectAsState()
+
     var isExpanded by remember { mutableStateOf(false) }
-    var selectedPriorityDomain by remember { mutableStateOf(PriorityDomain.NONE) }
 
     val priorities = PriorityDomain.entries.toTypedArray().filter { it != PriorityDomain.NONE }
 
@@ -61,6 +61,7 @@ fun WindowNewTaskScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
     ) {
+
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -72,6 +73,7 @@ fun WindowNewTaskScreen(
             label = { Text(text = "Название задачи") },
             singleLine = true,
         )
+
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -83,6 +85,7 @@ fun WindowNewTaskScreen(
             label = { Text(text = "Содержание задачи") },
             maxLines = 12,
         )
+
         Box(
             modifier = Modifier
                 .padding(top = 4.dp)
@@ -97,7 +100,7 @@ fun WindowNewTaskScreen(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
-                    text = "Приоритет: ${getPriorityText(selectedPriorityDomain)}"
+                    text = "Приоритет: ${getPriorityText(selectedPriority)}"
                 )
                 Icon(
                     imageVector =
@@ -118,7 +121,7 @@ fun WindowNewTaskScreen(
                 priorities.forEach { priority ->
                     DropdownMenuItem(
                         onClick = {
-                            selectedPriorityDomain = priority
+                            viewModel.updateSelectedPriority(priority)
                             isExpanded = false
                         },
                         text = {
@@ -132,6 +135,7 @@ fun WindowNewTaskScreen(
                 }
             }
         }
+
         Spacer(
             modifier = Modifier.weight(1f)
         )
@@ -145,10 +149,7 @@ fun WindowNewTaskScreen(
         ) {
             GeneralButton(
                 onClick = {
-                    if (selectedPriorityDomain != PriorityDomain.NONE && textStateLabel.isNotBlank()) {
-                        saveNewTask(textStateLabel, textStateBody, selectedPriorityDomain)
-                        onBack()
-                    } // добавить проверку с Snackbar
+                    viewModel.saveTask(onSuccess = onBack)
                 }
             ) {
                 Text(
@@ -179,7 +180,6 @@ fun WindowNewTaskScreenPreview() {
     TaskSchedulerTheme {
         WindowNewTaskScreen(
             onBack = {},
-            saveNewTask = { _, _, _ -> }
         )
     }
 }
