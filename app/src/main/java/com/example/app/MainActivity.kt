@@ -16,19 +16,19 @@ import com.example.app.ui.theme.TaskSchedulerTheme
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.NavHost
 import com.example.app.ui.screens.mainScreen.MainScreen
-import com.example.app.ui.screens.StatisticScreen.StatisticScreen
-import com.example.app.ui.screens.WindowNewTaskScreen.WindowNewTaskScreen
+import com.example.app.ui.screens.statisticScreen.StatisticScreen
+import com.example.app.ui.screens.windowNewTaskScreen.WindowNewTaskScreen
 import com.example.data.repository.TaskRepositoryImpl
 import com.example.domain.usecase.SaveTaskUseCase
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             TaskSchedulerTheme {
-                val taskRepository = remember { TaskRepositoryImpl() }
-                val saveTaskUseCase = remember { SaveTaskUseCase(taskRepository)
                 TaskScheduler()
             }
         }
@@ -36,9 +36,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun TaskScheduler(
-    saveTaskUseCase: SaveTaskUseCase
-) {
+fun TaskScheduler() {
     val navController = rememberNavController()
 
     Scaffold(
@@ -47,7 +45,7 @@ fun TaskScheduler(
     ) { innerPadding ->
         AppNavHost(
             navController = navController,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
         )
     }
 }
@@ -86,11 +84,7 @@ fun AppNavHost(
 
         composable("newTask") {
             WindowNewTaskScreen(
-                saveNewTask = {
-
-                },
-
-                onBack = {
+               onBack = {
                     navController.popBackStack()
                 },
             )
