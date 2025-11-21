@@ -1,17 +1,19 @@
-package com.example.app.ui.screens.WindowNewTaskScreen
+package com.example.app.ui.screens.windowNewTaskScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigationevent.NavigationEvent
 import com.example.domain.model.PriorityDomain
 import com.example.domain.usecase.SaveTaskUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class WindowNewTaskScreenViewModel(
+@HiltViewModel
+class WindowNewTaskScreenViewModel @Inject constructor(
     private val saveTaskUseCase: SaveTaskUseCase
 ): ViewModel() {
 
@@ -22,13 +24,13 @@ class WindowNewTaskScreenViewModel(
     }
 
     private val _textStateLabel = MutableStateFlow("")
-    val textStateLabel = _textStateLabel
+    val textStateLabel = _textStateLabel.asStateFlow()
     fun updateTextLabel(newTextLabel: String) {
         _textStateLabel.value = newTextLabel
     }
 
     private val _textStateDescription = MutableStateFlow("")
-    val textStateDescription = _textStateDescription
+    val textStateDescription = _textStateDescription.asStateFlow()
     fun updateTextDescription(newTextDescription: String) {
         _textStateDescription.value = newTextDescription
     }
@@ -44,7 +46,6 @@ class WindowNewTaskScreenViewModel(
                     body = _textStateDescription.value,
                     priorityDomain = _selectedPriority.value
                 )
-                // ВМЕСТО вызова колбэка: отправляем событие
                 _navigationEvent.emit(NavigationEvent.NavigateBack)
             }
         } else {

@@ -1,4 +1,4 @@
-package com.example.app.ui.screens.StatisticScreen
+package com.example.app.ui.screens.statisticScreen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize

@@ -1,4 +1,4 @@
-package com.example.app.ui.screens.WindowNewTaskScreen
+package com.example.app.ui.screens.windowNewTaskScreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +49,17 @@ fun WindowNewTaskScreen(
     val textStateLabel by viewModel.textStateLabel.collectAsState()
     val textStateBody by viewModel.textStateDescription.collectAsState()
     val selectedPriority by viewModel.selectedPriority.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collect { event ->
+            when (event) {
+                is WindowNewTaskScreenViewModel.NavigationEvent.NavigateBack -> {
+                    onBack()
+                }
+                    // snackbarHostState.showSnackbar("Заполните обязательные поля")
+            }
+        }
+    }
 
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -149,7 +161,7 @@ fun WindowNewTaskScreen(
         ) {
             GeneralButton(
                 onClick = {
-                    viewModel.saveTask(onSuccess = onBack)
+                    viewModel.onBackClicked()
                 }
             ) {
                 Text(
