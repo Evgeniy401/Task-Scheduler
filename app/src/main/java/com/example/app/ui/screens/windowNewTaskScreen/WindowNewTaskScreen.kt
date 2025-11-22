@@ -34,7 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.app.ui.components.GeneralButton
 import com.example.app.ui.theme.TaskSchedulerTheme
 import com.example.app.R
@@ -44,7 +44,7 @@ import com.example.domain.model.PriorityDomain
 @Composable
 fun WindowNewTaskScreen(
     onBack: () -> Unit,
-    viewModel: WindowNewTaskScreenViewModel = viewModel()
+    viewModel: WindowNewTaskScreenViewModel = hiltViewModel()
 ) {
     val textStateLabel by viewModel.textStateLabel.collectAsState()
     val textStateBody by viewModel.textStateDescription.collectAsState()
@@ -161,7 +161,7 @@ fun WindowNewTaskScreen(
         ) {
             GeneralButton(
                 onClick = {
-                    viewModel.onBackClicked()
+                    viewModel.saveTask()
                 }
             ) {
                 Text(

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -18,8 +17,6 @@ import androidx.navigation.compose.NavHost
 import com.example.app.ui.screens.mainScreen.MainScreen
 import com.example.app.ui.screens.statisticScreen.StatisticScreen
 import com.example.app.ui.screens.windowNewTaskScreen.WindowNewTaskScreen
-import com.example.data.repository.TaskRepositoryImpl
-import com.example.domain.usecase.SaveTaskUseCase
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
