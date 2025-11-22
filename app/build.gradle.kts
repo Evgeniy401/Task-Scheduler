@@ -49,7 +49,7 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material3) 
 
     implementation(project(":domain"))
     implementation(project(":data"))
@@ -64,25 +64,27 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    // Navigation
+    implementation(libs.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.runtime.ktx.v280)
 
-    implementation(libs.androidx.compose.material3.v120)
+    // Lifecycle
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    // Compose
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.material.icons.core)
 
+    // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
+    // WorkManager
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
-
     implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.androidx.hilt.work)
+
+    // Lifecycle services
     implementation(libs.androidx.lifecycle.service)
     implementation(libs.androidx.lifecycle.process)
-
-
-
 }

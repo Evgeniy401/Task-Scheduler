@@ -46,6 +46,7 @@ class WindowNewTaskScreenViewModel @Inject constructor(
                     body = _textStateDescription.value,
                     priorityDomain = _selectedPriority.value
                 )
+
                 _navigationEvent.emit(NavigationEvent.NavigateBack)
             }
         } else {
