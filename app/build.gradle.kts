@@ -87,4 +87,7 @@ dependencies {
     // Lifecycle services
     implementation(libs.androidx.lifecycle.service)
     implementation(libs.androidx.lifecycle.process)
+
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
 }

@@ -8,7 +8,13 @@ private var nextId = 1
 class TaskStorageImpl: TaskStorage {
 
     override fun save(task: Task) {
-        tasks.add(task)
+        val taskToSave = if (task.id == 0) task.copy(id = nextId++) else task
+        tasks.removeAll { it.id == taskToSave.id }
+        tasks.add(taskToSave)
+    }
+
+    override fun getAllTasks(): List<Task> {
+        return tasks.toList()
     }
 
     override fun deleteTask(taskId: Int) {
