@@ -3,7 +3,9 @@
     <string name="priority_none">не выбрано</string>
     <string name="priority_standard">Стандартный</string>
     <string name="priority_high">Высокий</string>
-    <string name="priority_maximum">Максммальный</string>
+    <string name="priority_maximum">Максимальный</string>
+    <string name="priority_prefix">приоритет: %s</string>
+
     <string name="open_menu">открыть меню</string>
 
 </resources>

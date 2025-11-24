@@ -2,7 +2,9 @@ package com.example.app.ui.screens.mainScreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -41,16 +43,17 @@ fun MainScreen(
             BottomAppBar(
                 modifier = Modifier
                     .height(130.dp),
-                containerColor = Color.Transparent
-                ,
+                containerColor = Color.Transparent,
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize(),
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Bottom
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     GeneralButton(
+                        modifier = Modifier.fillMaxWidth(),
                         onClick = {
                             onNavigateToWindowNewTask()
                         }
@@ -62,7 +65,8 @@ fun MainScreen(
                     }
                     GeneralButton(
                         modifier = Modifier
-                            .padding(top = 4.dp),
+                            .padding(top = 4.dp)
+                            .fillMaxWidth(),
                         onClick = {
                             onNavigateToStatistic()
                         }
@@ -91,9 +95,9 @@ fun TaskList(
     LazyColumn(
         modifier = modifier
             .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(tasks) {task ->
+        items(tasks) { task ->
             TaskCard(task = task)
         }
     }

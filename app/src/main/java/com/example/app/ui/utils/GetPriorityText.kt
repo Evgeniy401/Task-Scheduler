@@ -6,12 +6,17 @@ import com.example.app.R
 import com.example.domain.model.PriorityDomain
 
 @Composable
-fun getPriorityText(priorityDomain: PriorityDomain): String {
-    val textPriorityDomain = when (priorityDomain) {
+fun getPriorityText(priority: PriorityDomain, includePrefix: Boolean = true): String {
+    val priorityText = when (priority) {
         PriorityDomain.NONE -> stringResource(R.string.priority_none)
         PriorityDomain.STANDARD -> stringResource(R.string.priority_standard)
         PriorityDomain.HIGH -> stringResource(R.string.priority_high)
         PriorityDomain.MAXIMUM -> stringResource(R.string.priority_maximum)
     }
-    return textPriorityDomain
+
+    return if (includePrefix) {
+        stringResource(R.string.priority_prefix, priorityText)
+    } else {
+        priorityText
+    }
 }
