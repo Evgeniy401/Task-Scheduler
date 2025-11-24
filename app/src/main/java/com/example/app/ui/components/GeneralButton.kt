@@ -24,8 +24,6 @@ fun GeneralButton(
     ) {
         Box(
             modifier = Modifier
-                .height(30.dp)
-                .width(200.dp)
                 .wrapContentSize(Alignment.Center),
             contentAlignment = Alignment.Center
         ) {

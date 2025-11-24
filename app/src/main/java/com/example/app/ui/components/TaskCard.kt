@@ -22,6 +22,7 @@ import com.example.app.R
 import androidx.compose.ui.Alignment
 import com.example.domain.model.PriorityDomain
 import com.example.domain.model.Task
+import com.example.app.ui.utils.getPriorityText
 
 val task1 = Task(
     id = 1,
@@ -35,7 +36,7 @@ fun TaskCard(task: Task) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = when (task.priorityDomain) {
@@ -74,12 +75,7 @@ fun TaskCard(task: Task) {
                 Text(
                     modifier = Modifier
                         .padding(bottom = 5.dp),
-                    text = when (task.priorityDomain) {
-                        PriorityDomain.NONE -> stringResource(R.string.priority_standard)
-                        PriorityDomain.STANDARD -> stringResource(R.string.priority_standard)
-                        PriorityDomain.HIGH -> stringResource(R.string.priority_high)
-                        PriorityDomain.MAXIMUM -> stringResource(R.string.priority_maximum)
-                    },
+                    text = getPriorityText(task.priorityDomain, includePrefix = true),
                     style = MaterialTheme.typography.bodyLarge,
                 )
 
