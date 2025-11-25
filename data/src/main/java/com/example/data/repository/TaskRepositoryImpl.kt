@@ -25,11 +25,14 @@ class TaskRepositoryImpl@Inject constructor(
         updateFlow.emit(Unit)
     }
 
-    override fun getTasks(): Flow<List<Task>> = flow {
+    override fun getAllTasks(): Flow<List<Task>> = flow {
         updateFlow.collect {
             emit(taskStorage.getAllTasks())
         }
     }
 
-    override suspend fun deleteTask(taskId: Int) {}
+    override suspend fun deleteTask(taskId: Int) {
+        taskStorage.deleteTask(taskId)
+        updateFlow.emit(Unit)
+    }
 }

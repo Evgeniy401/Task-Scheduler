@@ -2,7 +2,7 @@ package com.example.app.ui.screens.mainScreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -43,17 +43,16 @@ fun MainScreen(
             BottomAppBar(
                 modifier = Modifier
                     .height(130.dp),
+                windowInsets = WindowInsets(0.dp),
                 containerColor = Color.Transparent,
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
+                        .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     GeneralButton(
-                        modifier = Modifier.fillMaxWidth(),
                         onClick = {
                             onNavigateToWindowNewTask()
                         }
@@ -64,9 +63,7 @@ fun MainScreen(
                         )
                     }
                     GeneralButton(
-                        modifier = Modifier
-                            .padding(top = 4.dp)
-                            .fillMaxWidth(),
+                        modifier = Modifier,
                         onClick = {
                             onNavigateToStatistic()
                         }
@@ -82,7 +79,9 @@ fun MainScreen(
     ) { paddingValues ->
         TaskList(
             modifier = Modifier.padding(paddingValues),
-            tasks = tasksList
+            tasks = tasksList,
+            onDeleteTask = { taskId -> viewModel.deleteTask(taskId) },
+            onCompleteTask = {}
         )
     }
 }
@@ -90,7 +89,9 @@ fun MainScreen(
 @Composable
 fun TaskList(
     modifier: Modifier = Modifier,
-    tasks: List<Task> = emptyList()
+    tasks: List<Task> = emptyList(),
+    onCompleteTask: (Int) -> Unit = {},
+    onDeleteTask: (Int) -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier
@@ -98,7 +99,10 @@ fun TaskList(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(tasks) { task ->
-            TaskCard(task = task)
+            TaskCard(task = task,
+                onCompleteTask = onCompleteTask,
+                onDeleteTask = onDeleteTask
+                )
         }
     }
 }

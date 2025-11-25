@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -14,11 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.app.R
 import androidx.compose.ui.Alignment
 import com.example.domain.model.PriorityDomain
 import com.example.domain.model.Task
@@ -32,7 +29,11 @@ val task1 = Task(
 )
 
 @Composable
-fun TaskCard(task: Task) {
+fun TaskCard(
+    task: Task,
+    onCompleteTask: (Int) -> Unit,
+    onDeleteTask: (Int) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -56,6 +57,7 @@ fun TaskCard(task: Task) {
             Text(
                 text = task.title,
                 style = MaterialTheme.typography.headlineSmall,
+                color = Color.Black
             )
 
             Text(
@@ -63,7 +65,8 @@ fun TaskCard(task: Task) {
                     .padding(horizontal = 5.dp),
                 text = task.body,
                 textAlign = TextAlign.Justify,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Black
             )
 
             Column(
@@ -77,12 +80,17 @@ fun TaskCard(task: Task) {
                         .padding(bottom = 5.dp),
                     text = getPriorityText(task.priorityDomain, includePrefix = true),
                     style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Black
                 )
 
-                Row {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
                     GeneralButton(
                         modifier = Modifier
-                            .width(150.dp),
+                            .weight(1f)
+                            .padding(end = 4.dp),
                         onClick = {},
                     ) {
                         Text(
@@ -97,11 +105,12 @@ fun TaskCard(task: Task) {
 
                     GeneralButton(
                         modifier = Modifier
-                            .width(150.dp),
-                        onClick = {}
+                            .weight(1f)
+                            .padding(end = 4.dp),
+                        onClick = { onDeleteTask(task.id) }
                     ) {
                         Text(
-                            text = "Отменить "
+                            text = "Удалить "
                         )
                     }
                 }
@@ -113,5 +122,9 @@ fun TaskCard(task: Task) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun TaskCardPreview() {
-    TaskCard(task = task1)
+    TaskCard(
+        task = task1,
+        onCompleteTask = {},
+        onDeleteTask = {}
+    )
 }
