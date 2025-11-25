@@ -25,4 +25,10 @@ class MainViewModel @Inject constructor(
             taskRepository.deleteTask(taskId)
         }
     }
+
+    fun completeTask(taskId: Int) {
+        viewModelScope.launch {
+            taskRepository.completeTask(taskId)
+        }
+    }
 }
