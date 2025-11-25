@@ -91,7 +91,7 @@ fun TaskCard(
                         modifier = Modifier
                             .weight(1f)
                             .padding(end = 4.dp),
-                        onClick = {},
+                        onClick = { onCompleteTask(task.id) },
                     ) {
                         Text(
                             text = "Выполнить "

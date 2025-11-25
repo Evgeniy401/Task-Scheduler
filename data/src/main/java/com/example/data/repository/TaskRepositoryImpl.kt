@@ -35,4 +35,9 @@ class TaskRepositoryImpl@Inject constructor(
         taskStorage.deleteTask(taskId)
         updateFlow.emit(Unit)
     }
+
+    override suspend fun completeTask(taskId: Int) {
+        taskStorage.completeTask(taskId)
+        updateFlow.emit(Unit)
+    }
 }

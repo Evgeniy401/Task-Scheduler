@@ -81,7 +81,7 @@ fun MainScreen(
             modifier = Modifier.padding(paddingValues),
             tasks = tasksList,
             onDeleteTask = { taskId -> viewModel.deleteTask(taskId) },
-            onCompleteTask = {}
+            onCompleteTask = { taskId -> viewModel.completeTask(taskId) }
         )
     }
 }
@@ -101,7 +101,7 @@ fun TaskList(
         items(tasks) { task ->
             TaskCard(task = task,
                 onCompleteTask = onCompleteTask,
-                onDeleteTask = onDeleteTask
+                onDeleteTask = onDeleteTask,
                 )
         }
     }

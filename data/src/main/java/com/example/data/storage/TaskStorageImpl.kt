@@ -21,8 +21,7 @@ class TaskStorageImpl: TaskStorage {
         tasks.removeAll { it.id == taskId }
     }
 
-    private fun mapToTaskData(task: Task) {
-        return
+    override fun completeTask(taskId: Int) {
+        tasks.removeAll { it.id == taskId }
     }
-
 }
