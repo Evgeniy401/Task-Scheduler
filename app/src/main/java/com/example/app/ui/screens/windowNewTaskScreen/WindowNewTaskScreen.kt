@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -73,17 +74,16 @@ fun WindowNewTaskScreen(
         bottomBar = {
             BottomAppBar(
                 modifier = Modifier.height(130.dp),
+                windowInsets = WindowInsets(0.dp),
                 containerColor = Color.Transparent
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
+                        .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     GeneralButton(
-                        modifier = Modifier.fillMaxWidth(),
                         onClick = {
                             viewModel.saveTask()
                         }
@@ -94,7 +94,6 @@ fun WindowNewTaskScreen(
                         )
                     }
                     GeneralButton(
-                        modifier = Modifier.fillMaxWidth(),
                         onClick = {
                             onBack()
                         }
