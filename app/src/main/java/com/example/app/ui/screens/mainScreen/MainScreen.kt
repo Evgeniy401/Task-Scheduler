@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.app.ui.components.GeneralButton
 import com.example.app.ui.components.TaskCard
+import com.example.app.ui.components.WarningDialog
 import com.example.app.ui.theme.TaskSchedulerTheme
 import com.example.domain.model.Task
 
@@ -35,6 +36,15 @@ fun MainScreen(
 ) {
 
     val tasksList by viewModel.tasks.collectAsState()
+    val showDeleteDialog by viewModel.showDeleteDialog.collectAsState()
+    val taskToDelete by viewModel.taskToDelete.collectAsState()
+
+    if (showDeleteDialog) {
+        WarningDialogDelete(
+            onConfirm = { viewModel.confirmDelete() },
+            onCancel = { viewModel.cancelDelete() }
+        )
+    }
 
     Scaffold(
         modifier = Modifier
@@ -80,7 +90,7 @@ fun MainScreen(
         TaskList(
             modifier = Modifier.padding(paddingValues),
             tasks = tasksList,
-            onDeleteTask = { taskId -> viewModel.deleteTask(taskId) },
+            onDeleteTask = { taskId -> viewModel.showDeleteConfirmation(taskId) },
             onCompleteTask = { taskId -> viewModel.completeTask(taskId) }
         )
     }
@@ -107,10 +117,24 @@ fun TaskList(
     }
 }
 
+@Composable
+fun WarningDialogDelete(
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit
+) {
+    WarningDialog(
+        title = "Подтверждение действия",
+        message = "Вы уверены, что хотите удалить эту задачу?",
+        onConfirm = onConfirm,
+        onCancel = onCancel,
+        onDismiss = onCancel
+    )
+}
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun MainScreenPreview() {
-    TaskSchedulerTheme() {
+    TaskSchedulerTheme {
         MainScreen(
             onNavigateToStatistic = {},
             onNavigateToWindowNewTask = {}
