@@ -3,6 +3,7 @@ package com.example.app.ui.screens.windowNewTaskScreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.model.PriorityDomain
+import com.example.domain.usecase.DeterminePriorityUseCase
 import com.example.domain.usecase.SaveTaskUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WindowNewTaskScreenViewModel @Inject constructor(
-    private val saveTaskUseCase: SaveTaskUseCase
+    private val saveTaskUseCase: SaveTaskUseCase,
+    private val determinePriorityUseCase: DeterminePriorityUseCase,
 ): ViewModel() {
 
     private val _selectedPriority = MutableStateFlow(PriorityDomain.NONE)
@@ -39,30 +41,29 @@ class WindowNewTaskScreenViewModel @Inject constructor(
     val navigationEvent = _navigationEvent.asSharedFlow()
 
     fun saveTask() {
-        if (_selectedPriority.value != PriorityDomain.NONE && _textStateLabel.value.isNotBlank()) {
+        if (_textStateLabel.value.isNotBlank()) {
             viewModelScope.launch {
+                val priorityToSave = determinePriorityUseCase(_selectedPriority.value)
+
                 saveTaskUseCase(
                     title = _textStateLabel.value,
                     body = _textStateDescription.value,
-                    priorityDomain = _selectedPriority.value
+                    priorityDomain = priorityToSave
                 )
 
                 _navigationEvent.emit(NavigationEvent.NavigateBack)
             }
         } else {
-            // добавить поверку валидации
+            viewModelScope.launch {
+                _navigationEvent.emit(NavigationEvent.ShowValidationError)
+            }
         }
     }
 
-    fun onBackClicked() {
-        viewModelScope.launch {
-            _navigationEvent.emit(NavigationEvent.NavigateBack)
-        }
-    }
 
     sealed class NavigationEvent {
         object NavigateBack : NavigationEvent()
-
+        object ShowValidationError : NavigationEvent()
     }
 
 
