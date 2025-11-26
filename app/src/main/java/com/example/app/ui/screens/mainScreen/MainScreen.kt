@@ -10,14 +10,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,15 +37,12 @@ fun MainScreen(
     onNavigateToWindowNewTask: () -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsState()
 
-    val tasksList by viewModel.tasks.collectAsState()
-    val showDialog by viewModel.showConfirmationDialog.collectAsState()
-    val pendingAction by viewModel.currentPendingAction.collectAsState()
-
-    if (showDialog) {
-        val dialogConfig = when (pendingAction?.type) {
-            is MainViewModel.ConfirmationType.Delete -> DialogConfig.Delete
-            is MainViewModel.ConfirmationType.Complete -> DialogConfig.Complete
+    if (uiState.showConfirmationDialog) {
+        val dialogConfig = when (uiState.pendingAction?.type) {
+            is MainScreenState.ConfirmationType.Delete -> DialogConfig.Delete
+            is MainScreenState.ConfirmationType.Complete -> DialogConfig.Complete
             null -> DialogConfig.Delete
         }
 
@@ -70,7 +70,7 @@ fun MainScreen(
     ) { paddingValues ->
         TaskList(
             modifier = Modifier.padding(paddingValues),
-            tasks = tasksList,
+            tasks = uiState.tasks,
             onDeleteTask = viewModel::showDeleteConfirmation,
             onCompleteTask = viewModel::showCompleteConfirmation,
         )
@@ -129,22 +129,53 @@ private fun ConfirmationDialog(
 @Composable
 private fun TaskList(
     modifier: Modifier = Modifier,
-    tasks: List<Task> = emptyList(),
+    tasks: List<MainScreenState.TaskItem> = emptyList(),
     onCompleteTask: (Int) -> Unit = {},
     onDeleteTask: (Int) -> Unit = {}
 ) {
+    val groupedTasks = remember(tasks) {
+        tasks.groupBy { it.priorityGroup }
+    }
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(tasks) { task ->
-            TaskCard(
-                task = task,
-                onCompleteTask = onCompleteTask,
-                onDeleteTask = onDeleteTask,
-            )
+        groupedTasks.forEach { (priorityGroup, tasksInGroup) ->
+            item {
+                PriorityHeader(priorityGroup)
+            }
+            items(tasksInGroup) { task ->
+                TaskCard(
+                    task = task.toDomainTask(),
+                    onCompleteTask = onCompleteTask,
+                    onDeleteTask = onDeleteTask,
+                )
+            }
         }
     }
+}
+
+@Composable
+private fun PriorityHeader(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium,
+        color = Color.Black,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    )
+}
+
+private fun MainScreenState.TaskItem.toDomainTask(): Task {
+    return Task(
+        id = this.id,
+        title = this.title,
+        body = this.body,
+        priorityDomain = this.priority
+    )
 }
 
 @Preview(showBackground = true, showSystemUi = true)
