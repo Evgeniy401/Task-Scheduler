@@ -17,34 +17,55 @@ class MainViewModel @Inject constructor(
     private val taskRepository: TaskRepository
 ) : ViewModel() {
 
-    private val _showDeleteDialog = MutableStateFlow(false)
-    val showDeleteDialog: StateFlow<Boolean> = _showDeleteDialog.asStateFlow()
+    sealed class ConfirmationType {
+        data object Delete : ConfirmationType()
+        data object Complete : ConfirmationType()
+    }
 
-    private val _taskToDelete = MutableStateFlow<Int?>(null)
-    val taskToDelete: StateFlow<Int?> = _taskToDelete.asStateFlow()
+    data class PendingAction(
+        val taskId: Int,
+        val type: ConfirmationType
+    )
+
+    private val _pendingAction = MutableStateFlow<PendingAction?>(null)
+    private val _showConfirmationDialog = MutableStateFlow(false)
+
+    val showConfirmationDialog: StateFlow<Boolean> = _showConfirmationDialog.asStateFlow()
+    val currentPendingAction: StateFlow<PendingAction?> = _pendingAction.asStateFlow()
 
     fun showDeleteConfirmation(taskId: Int) {
-        _taskToDelete.value = taskId
-        _showDeleteDialog.value = true
+        showConfirmation(ConfirmationType.Delete, taskId)
     }
 
-    fun confirmDelete() {
-        val taskId = _taskToDelete.value
-        if (taskId != null) {
+    fun showCompleteConfirmation(taskId: Int) {
+        showConfirmation(ConfirmationType.Complete, taskId)
+    }
+
+    fun confirmAction() {
+        val action = _pendingAction.value
+        if (action != null) {
             viewModelScope.launch {
-                taskRepository.deleteTask(taskId)
+                when (action.type) {
+                    is ConfirmationType.Delete -> taskRepository.deleteTask(action.taskId)
+                    is ConfirmationType.Complete -> taskRepository.completeTask(action.taskId)
+                }
             }
         }
-        hideDeleteDialog()
+        hideConfirmation()
     }
 
-    fun cancelDelete() {
-        hideDeleteDialog()
+    fun cancelAction() {
+        hideConfirmation()
     }
 
-    private fun hideDeleteDialog() {
-        _showDeleteDialog.value = false
-        _taskToDelete.value = null
+    private fun showConfirmation(type: ConfirmationType, taskId: Int) {
+        _pendingAction.value = PendingAction(taskId, type)
+        _showConfirmationDialog.value = true
+    }
+
+    private fun hideConfirmation() {
+        _showConfirmationDialog.value = false
+        _pendingAction.value = null
     }
 
     val tasks = taskRepository.getAllTasks()
@@ -53,16 +74,4 @@ class MainViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
-
-    fun deleteTask(taskId: Int) {
-        viewModelScope.launch {
-            taskRepository.deleteTask(taskId)
-        }
-    }
-
-    fun completeTask(taskId: Int) {
-        viewModelScope.launch {
-            taskRepository.completeTask(taskId)
-        }
-    }
 }

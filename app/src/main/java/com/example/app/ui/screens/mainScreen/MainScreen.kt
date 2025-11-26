@@ -36,99 +36,115 @@ fun MainScreen(
 ) {
 
     val tasksList by viewModel.tasks.collectAsState()
-    val showDeleteDialog by viewModel.showDeleteDialog.collectAsState()
-    val taskToDelete by viewModel.taskToDelete.collectAsState()
+    val showDialog by viewModel.showConfirmationDialog.collectAsState()
+    val pendingAction by viewModel.currentPendingAction.collectAsState()
 
-    if (showDeleteDialog) {
-        WarningDialogDelete(
-            onConfirm = { viewModel.confirmDelete() },
-            onCancel = { viewModel.cancelDelete() }
+    if (showDialog) {
+        val dialogConfig = when (pendingAction?.type) {
+            is MainViewModel.ConfirmationType.Delete -> DialogConfig.Delete
+            is MainViewModel.ConfirmationType.Complete -> DialogConfig.Complete
+            null -> DialogConfig.Delete
+        }
+
+        ConfirmationDialog(
+            config = dialogConfig,
+            onConfirm = { viewModel.confirmAction() },
+            onCancel = { viewModel.cancelAction() }
         )
     }
 
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         bottomBar = {
             BottomAppBar(
-                modifier = Modifier
-                    .height(130.dp),
+                modifier = Modifier.height(130.dp),
                 windowInsets = WindowInsets(0.dp),
                 containerColor = Color.Transparent,
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    GeneralButton(
-                        onClick = {
-                            onNavigateToWindowNewTask()
-                        }
-                    ) {
-                        Text(
-                            text = "Новая задача",
-                            fontSize = 20.sp,
-                        )
-                    }
-                    GeneralButton(
-                        modifier = Modifier,
-                        onClick = {
-                            onNavigateToStatistic()
-                        }
-                    ) {
-                        Text(
-                            text = "Статистика",
-                            fontSize = 20.sp,
-                        )
-                    }
-                }
+                ButtonsColumn(
+                    onNewTask = onNavigateToWindowNewTask,
+                    onStatistics = onNavigateToStatistic
+                )
             }
         }
     ) { paddingValues ->
         TaskList(
             modifier = Modifier.padding(paddingValues),
             tasks = tasksList,
-            onDeleteTask = { taskId -> viewModel.showDeleteConfirmation(taskId) },
-            onCompleteTask = { taskId -> viewModel.completeTask(taskId) }
+            onDeleteTask = viewModel::showDeleteConfirmation,
+            onCompleteTask = viewModel::showCompleteConfirmation,
         )
     }
 }
 
+private sealed class DialogConfig(
+    val title: String,
+    val message: String
+) {
+    data object Delete : DialogConfig(
+        title = "Подтверждение действия",
+        message = "Вы уверены, что хотите удалить эту задачу?"
+    )
+
+    data object Complete : DialogConfig(
+        title = "Подтверждение действия",
+        message = "Задача выполнена?"
+    )
+}
+
 @Composable
-fun TaskList(
+private fun ButtonsColumn(
+    onNewTask: () -> Unit,
+    onStatistics: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        GeneralButton(onClick = onNewTask) {
+            Text(text = "Новая задача", fontSize = 20.sp)
+        }
+        GeneralButton(onClick = onStatistics) {
+            Text(text = "Статистика", fontSize = 20.sp)
+        }
+    }
+}
+
+@Composable
+private fun ConfirmationDialog(
+    config: DialogConfig,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit
+) {
+    WarningDialog(
+        title = config.title,
+        message = config.message,
+        onConfirm = onConfirm,
+        onCancel = onCancel,
+        onDismiss = onCancel
+    )
+}
+
+@Composable
+private fun TaskList(
     modifier: Modifier = Modifier,
     tasks: List<Task> = emptyList(),
     onCompleteTask: (Int) -> Unit = {},
     onDeleteTask: (Int) -> Unit = {}
 ) {
     LazyColumn(
-        modifier = modifier
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(tasks) { task ->
-            TaskCard(task = task,
+            TaskCard(
+                task = task,
                 onCompleteTask = onCompleteTask,
                 onDeleteTask = onDeleteTask,
-                )
+            )
         }
     }
-}
-
-@Composable
-fun WarningDialogDelete(
-    onConfirm: () -> Unit,
-    onCancel: () -> Unit
-) {
-    WarningDialog(
-        title = "Подтверждение действия",
-        message = "Вы уверены, что хотите удалить эту задачу?",
-        onConfirm = onConfirm,
-        onCancel = onCancel,
-        onDismiss = onCancel
-    )
 }
 
 @Preview(showBackground = true, showSystemUi = true)
