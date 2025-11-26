@@ -23,6 +23,9 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,6 +57,7 @@ fun WindowNewTaskScreen(
     val textStateLabel by viewModel.textStateLabel.collectAsState()
     val textStateBody by viewModel.textStateDescription.collectAsState()
     val selectedPriority by viewModel.selectedPriority.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.navigationEvent.collect { event ->
@@ -61,7 +65,9 @@ fun WindowNewTaskScreen(
                 is WindowNewTaskScreenViewModel.NavigationEvent.NavigateBack -> {
                     onBack()
                 }
-                    // snackbarHostState.showSnackbar("Заполните обязательные поля")
+                is WindowNewTaskScreenViewModel.NavigationEvent.ShowValidationError -> {
+                    snackbarHostState.showSnackbar("Заполните необходимые поля")
+                }
             }
         }
     }
@@ -71,6 +77,22 @@ fun WindowNewTaskScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(
+                    modifier = Modifier.padding(16.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    containerColor = Color(0xFFD32F2F),
+                    contentColor = Color.White
+                ) {
+                    Text(
+                        text = data.visuals.message,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        },
         bottomBar = {
             BottomAppBar(
                 modifier = Modifier.height(130.dp),

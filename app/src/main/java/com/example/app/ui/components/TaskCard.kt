@@ -6,8 +6,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,9 +23,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
+import com.example.app.mapping.TaskDomainUiMapper
 import com.example.domain.model.PriorityDomain
 import com.example.domain.model.Task
-import com.example.app.ui.utils.getPriorityText
 
 val task1 = Task(
     id = 1,
@@ -32,7 +38,8 @@ val task1 = Task(
 fun TaskCard(
     task: Task,
     onCompleteTask: (Int) -> Unit,
-    onDeleteTask: (Int) -> Unit
+    onDeleteTask: (Int) -> Unit,
+    taskMapper: TaskDomainUiMapper,
 ) {
     Card(
         modifier = Modifier
@@ -40,12 +47,7 @@ fun TaskCard(
             .padding(horizontal = 16.dp),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
-            containerColor = when (task.priorityDomain) {
-                PriorityDomain.NONE -> Color(0xFFF5F5F5)
-                PriorityDomain.STANDARD -> Color(0xFFE8F5E8)
-                PriorityDomain.HIGH -> Color(0xFFFFF9C4)
-                PriorityDomain.MAXIMUM -> Color(0xFFFFEBEE)
-            }
+            containerColor = taskMapper.getTaskCardColor(task.priorityDomain)
         )
     ) {
         Column(
@@ -75,26 +77,21 @@ fun TaskCard(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Text(
-                    modifier = Modifier
-                        .padding(bottom = 5.dp),
-                    text = getPriorityText(task.priorityDomain, includePrefix = true),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.Black
-                )
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    GeneralButton(
+                    IconButton(
                         modifier = Modifier
                             .weight(1f)
                             .padding(end = 4.dp),
                         onClick = { onCompleteTask(task.id) },
                     ) {
-                        Text(
-                            text = "Выполнить "
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Выполнить задачу",
+                            modifier = Modifier.size(32.dp),
+                            tint = Color.Green
                         )
                     }
 
@@ -103,14 +100,17 @@ fun TaskCard(
                             .padding(start = 10.dp)
                     )
 
-                    GeneralButton(
+                    IconButton(
                         modifier = Modifier
                             .weight(1f)
                             .padding(end = 4.dp),
                         onClick = { onDeleteTask(task.id) }
                     ) {
-                        Text(
-                            text = "Удалить "
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Удалить задачу",
+                            modifier = Modifier.size(32.dp),
+                            tint = Color.Red
                         )
                     }
                 }
@@ -125,6 +125,7 @@ fun TaskCardPreview() {
     TaskCard(
         task = task1,
         onCompleteTask = {},
-        onDeleteTask = {}
+        onDeleteTask = {},
+        taskMapper = TaskDomainUiMapper(),
     )
 }

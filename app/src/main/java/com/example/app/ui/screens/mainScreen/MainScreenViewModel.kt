@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
-    private val taskMapper: TaskDomainUiMapper
+    val taskMapper: TaskDomainUiMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MainScreenState())

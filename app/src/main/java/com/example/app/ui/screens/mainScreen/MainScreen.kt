@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.app.mapping.TaskDomainUiMapper
 import com.example.app.ui.components.GeneralButton
 import com.example.app.ui.components.TaskCard
 import com.example.app.ui.components.WarningDialog
@@ -73,6 +74,7 @@ fun MainScreen(
             tasks = uiState.tasks,
             onDeleteTask = viewModel::showDeleteConfirmation,
             onCompleteTask = viewModel::showCompleteConfirmation,
+            taskMapper = viewModel.taskMapper
         )
     }
 }
@@ -131,7 +133,8 @@ private fun TaskList(
     modifier: Modifier = Modifier,
     tasks: List<MainScreenState.TaskItem> = emptyList(),
     onCompleteTask: (Int) -> Unit = {},
-    onDeleteTask: (Int) -> Unit = {}
+    onDeleteTask: (Int) -> Unit = {},
+    taskMapper: TaskDomainUiMapper
 ) {
     val groupedTasks = remember(tasks) {
         tasks.groupBy { it.priorityGroup }
@@ -143,30 +146,21 @@ private fun TaskList(
     ) {
         groupedTasks.forEach { (priorityGroup, tasksInGroup) ->
             item {
-                PriorityHeader(priorityGroup)
+                PriorityHeader(
+                    title = priorityGroup,
+                    priorityColor = tasksInGroup.firstOrNull()?.priorityColor ?: Color.Gray
+                )
             }
             items(tasksInGroup) { task ->
                 TaskCard(
                     task = task.toDomainTask(),
                     onCompleteTask = onCompleteTask,
                     onDeleteTask = onDeleteTask,
+                    taskMapper = taskMapper
                 )
             }
         }
     }
-}
-
-@Composable
-private fun PriorityHeader(title: String) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleMedium,
-        color = Color.Black,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    )
 }
 
 private fun MainScreenState.TaskItem.toDomainTask(): Task {
@@ -178,13 +172,30 @@ private fun MainScreenState.TaskItem.toDomainTask(): Task {
     )
 }
 
+@Composable
+private fun PriorityHeader(
+    title: String,
+    priorityColor: Color
+) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium,
+        color = priorityColor,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    )
+}
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun MainScreenPreview() {
     TaskSchedulerTheme {
         MainScreen(
             onNavigateToStatistic = {},
-            onNavigateToWindowNewTask = {}
+            onNavigateToWindowNewTask = {},
+            // мок маппер
         )
     }
 }
