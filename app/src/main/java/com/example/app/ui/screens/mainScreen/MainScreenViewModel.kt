@@ -2,52 +2,61 @@ package com.example.app.ui.screens.mainScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.app.mapping.TaskDomainUiMapper
 import com.example.domain.repository.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
+    private val taskMapper: TaskDomainUiMapper
 ) : ViewModel() {
 
-    sealed class ConfirmationType {
-        data object Delete : ConfirmationType()
-        data object Complete : ConfirmationType()
+    private val _uiState = MutableStateFlow(MainScreenState())
+    val uiState: StateFlow<MainScreenState> = _uiState.asStateFlow()
+
+    init {
+        loadTasks()
     }
 
-    data class PendingAction(
-        val taskId: Int,
-        val type: ConfirmationType
-    )
-
-    private val _pendingAction = MutableStateFlow<PendingAction?>(null)
-    private val _showConfirmationDialog = MutableStateFlow(false)
-
-    val showConfirmationDialog: StateFlow<Boolean> = _showConfirmationDialog.asStateFlow()
-    val currentPendingAction: StateFlow<PendingAction?> = _pendingAction.asStateFlow()
+    private fun loadTasks() {
+        taskRepository.getAllTasks()
+            .onEach { tasks ->
+                val taskItems = taskMapper.toUiState(tasks)
+                _uiState.update { currentState ->
+                    currentState.copy(tasks = taskItems)
+                }
+            }
+            .launchIn(viewModelScope)
+    }
 
     fun showDeleteConfirmation(taskId: Int) {
-        showConfirmation(ConfirmationType.Delete, taskId)
+        showConfirmation(MainScreenState.ConfirmationType.Delete, taskId)
     }
 
     fun showCompleteConfirmation(taskId: Int) {
-        showConfirmation(ConfirmationType.Complete, taskId)
+        showConfirmation(MainScreenState.ConfirmationType.Complete, taskId)
     }
 
     fun confirmAction() {
-        val action = _pendingAction.value
+        val action = _uiState.value.pendingAction
         if (action != null) {
             viewModelScope.launch {
                 when (action.type) {
-                    is ConfirmationType.Delete -> taskRepository.deleteTask(action.taskId)
-                    is ConfirmationType.Complete -> taskRepository.completeTask(action.taskId)
+                    is MainScreenState.ConfirmationType.Delete -> {
+                        taskRepository.deleteTask(action.taskId)
+                    }
+                    is MainScreenState.ConfirmationType.Complete -> {
+                        taskRepository.completeTask(action.taskId)
+                    }
                 }
             }
         }
@@ -58,20 +67,21 @@ class MainViewModel @Inject constructor(
         hideConfirmation()
     }
 
-    private fun showConfirmation(type: ConfirmationType, taskId: Int) {
-        _pendingAction.value = PendingAction(taskId, type)
-        _showConfirmationDialog.value = true
+    private fun showConfirmation(type: MainScreenState.ConfirmationType, taskId: Int) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                showConfirmationDialog = true,
+                pendingAction = MainScreenState.PendingAction(taskId, type)
+            )
+        }
     }
 
     private fun hideConfirmation() {
-        _showConfirmationDialog.value = false
-        _pendingAction.value = null
+        _uiState.update { currentState ->
+            currentState.copy(
+                showConfirmationDialog = false,
+                pendingAction = null
+            )
+        }
     }
-
-    val tasks = taskRepository.getAllTasks()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
 }
