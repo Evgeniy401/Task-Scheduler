@@ -28,10 +28,11 @@ import com.example.domain.model.PriorityDomain
 import com.example.domain.model.Task
 
 val task1 = Task(
-    id = 1,
-    title = "Помыть машину",
-    body = "Это очень длинное описание задачи, которое занимает несколько строк и должно автоматически увеличивать высоту карточки в зависимости от объема текста",
-    priorityDomain = PriorityDomain.STANDARD
+id = 1,
+title = "Помыть машину",
+body = "Это очень длинное описание задачи, которое занимает несколько строк и должно автоматически увеличивать высоту карточки в зависимости от объема текста",
+priorityDomain = PriorityDomain.STANDARD,
+isCompleted = false
 )
 
 @Composable
@@ -121,9 +122,10 @@ fun TaskCard(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun TaskCardPreview() {
+fun CompletedTaskCardPreview() {
+    val completedTask = task1.copy(isCompleted = true)
     TaskCard(
-        task = task1,
+        task = completedTask,
         onCompleteTask = {},
         onDeleteTask = {},
         taskMapper = TaskDomainUiMapper(),

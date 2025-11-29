@@ -4,7 +4,8 @@ data class Task(
     val id: Int,
     val title: String,
     val body: String,
-    val priorityDomain: PriorityDomain
+    val priorityDomain: PriorityDomain,
+    val isCompleted: Boolean
 ) {
     fun getPriorityValue(): Int {
         return when (this.priorityDomain) {

@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.app.mapping.TaskDomainUiMapper
 import com.example.domain.repository.TaskRepository
+import com.example.domain.usecase.CompleteTaskUseCase
+import com.example.domain.usecase.DeleteTaskUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,8 +17,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
+class MainScreenViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
+    private val deleteTaskUseCase: DeleteTaskUseCase,
+    private val completeTaskUseCase: CompleteTaskUseCase,
     val taskMapper: TaskDomainUiMapper
 ) : ViewModel() {
 
@@ -52,10 +56,10 @@ class MainViewModel @Inject constructor(
             viewModelScope.launch {
                 when (action.type) {
                     is MainScreenState.ConfirmationType.Delete -> {
-                        taskRepository.deleteTask(action.taskId)
+                        deleteTaskUseCase(action.taskId)
                     }
                     is MainScreenState.ConfirmationType.Complete -> {
-                        taskRepository.completeTask(action.taskId)
+                        completeTaskUseCase(action.taskId)
                     }
                 }
             }

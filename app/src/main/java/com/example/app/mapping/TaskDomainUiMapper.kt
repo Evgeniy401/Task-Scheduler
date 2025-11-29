@@ -18,7 +18,8 @@ class TaskDomainUiMapper @Inject constructor() {
                     body = task.body,
                     priority = task.priorityDomain,
                     priorityGroup = getPriorityGroupName(task.priorityDomain),
-                    priorityColor = getPriorityColor(task.priorityDomain)
+                    priorityColor = getPriorityColor(task.priorityDomain),
+                    isCompleted = task.isCompleted
                 )
             }
     }

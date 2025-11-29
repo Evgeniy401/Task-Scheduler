@@ -33,10 +33,10 @@ import com.example.app.ui.theme.TaskSchedulerTheme
 import com.example.domain.model.Task
 
 @Composable
-fun MainScreen(
+fun MainScreen (
     onNavigateToStatistic: () -> Unit,
     onNavigateToWindowNewTask: () -> Unit,
-    viewModel: MainViewModel = hiltViewModel()
+    viewModel: MainScreenViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -141,7 +141,7 @@ private fun TaskList(
     }
 
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         groupedTasks.forEach { (priorityGroup, tasksInGroup) ->
@@ -168,7 +168,8 @@ private fun MainScreenState.TaskItem.toDomainTask(): Task {
         id = this.id,
         title = this.title,
         body = this.body,
-        priorityDomain = this.priority
+        priorityDomain = this.priority,
+        isCompleted = this.isCompleted
     )
 }
 

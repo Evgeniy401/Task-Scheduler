@@ -1,12 +1,13 @@
 package com.example.data.storage
 
 import com.example.domain.model.Task
+import kotlinx.coroutines.flow.Flow
 
 interface TaskStorage {
 
-    fun save(task: Task)
-    fun getAllTasks(): List<Task>
-    fun deleteTask(taskId: Int)
-    fun completeTask(taskId: Int)
+    suspend fun save(task: Task)
+    fun getAllTasks(): Flow<List<Task>>
+    suspend fun deleteTask(taskId: Int)
+    suspend fun completeTask(taskId: Int)
 
 }

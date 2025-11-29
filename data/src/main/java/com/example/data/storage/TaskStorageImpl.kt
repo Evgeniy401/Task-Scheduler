@@ -1,27 +1,37 @@
 package com.example.data.storage
 
+import com.example.data.mapping.TaskDataMapper
+import com.example.data.storage.dao.TaskDao
 import com.example.domain.model.Task
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-private val tasks = mutableListOf<Task>() // временное хранилище данных в памяти
-private var nextId = 1
+class TaskStorageImpl @Inject constructor(
+    private val taskDao: TaskDao,
+    private val mapper: TaskDataMapper
+) : TaskStorage {
 
-class TaskStorageImpl: TaskStorage {
-
-    override fun save(task: Task) {
-        val taskToSave = if (task.id == 0) task.copy(id = nextId++) else task
-        tasks.removeAll { it.id == taskToSave.id }
-        tasks.add(taskToSave)
+    override suspend fun save(task: Task) {
+        val taskEntity = mapper.toData(task)
+        taskDao.insertTask(taskEntity)
     }
 
-    override fun getAllTasks(): List<Task> {
-        return tasks.toList()
+    override fun getAllTasks(): Flow<List<Task>> {
+        return taskDao.getAllTasks().map { entities ->
+            mapper.toDomainList(entities)
+        }
     }
 
-    override fun deleteTask(taskId: Int) {
-        tasks.removeAll { it.id == taskId }
+    override suspend fun deleteTask(taskId: Int) {
+        taskDao.deleteTaskById(taskId)
     }
 
-    override fun completeTask(taskId: Int) {
-        tasks.removeAll { it.id == taskId }
+    override suspend fun completeTask(taskId: Int) {
+        val task = taskDao.getTaskById(taskId)
+        task?.let {
+            val completedTask = it.copy(isCompleted = true)
+            taskDao.insertTask(completedTask)
+        }
     }
 }
