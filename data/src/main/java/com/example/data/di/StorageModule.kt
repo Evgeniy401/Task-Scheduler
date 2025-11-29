@@ -17,4 +17,5 @@ abstract class StorageModule {
     abstract fun bindTaskStorage(
         taskStorageImpl: TaskStorageImpl
     ): TaskStorage
+
 }
