@@ -17,7 +17,8 @@ data class MainScreenState(
         val priority: PriorityDomain,
         val priorityGroup: String,
         val priorityColor: Color,
-        val isCompleted: Boolean
+        val isCompleted: Boolean,
+        val needsSync: Boolean
     )
 
     data class PendingAction(

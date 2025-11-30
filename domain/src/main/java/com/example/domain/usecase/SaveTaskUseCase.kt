@@ -19,6 +19,9 @@ class SaveTaskUseCase @Inject constructor(
             body = body,
             priorityDomain = priorityDomain,
             isCompleted = false,
+            needsSync = false,
+            isDeleted = false,
+            lastModified = System.currentTimeMillis()
         )
         taskRepository.saveTask(task)
     }
