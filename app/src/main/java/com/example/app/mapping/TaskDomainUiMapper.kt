@@ -19,17 +19,18 @@ class TaskDomainUiMapper @Inject constructor() {
                     priority = task.priorityDomain,
                     priorityGroup = getPriorityGroupName(task.priorityDomain),
                     priorityColor = getPriorityColor(task.priorityDomain),
-                    isCompleted = task.isCompleted
+                    isCompleted = task.isCompleted,
+                    needsSync = task.needsSync
                 )
             }
     }
 
     fun getPriorityColor(priority: PriorityDomain): Color {
         return when (priority) {
-            PriorityDomain.MAXIMUM -> Color.Red
-            PriorityDomain.HIGH -> Color.Yellow
-            PriorityDomain.STANDARD -> Color.Green
-            PriorityDomain.NONE -> Color.Gray
+            PriorityDomain.MAXIMUM -> Color(0xFFD32F2F)
+            PriorityDomain.HIGH -> Color(0xFFFFA000)
+            PriorityDomain.STANDARD -> Color(0xFF388E3C)
+            PriorityDomain.NONE -> Color(0xFF757575)
         }
     }
 
