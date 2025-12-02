@@ -11,7 +11,7 @@ import com.example.data.storage.entity.TaskEntity
 
 @Database(
     entities = [TaskEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 
@@ -30,7 +30,7 @@ abstract class TaskDatabase : RoomDatabase() {
                     TaskDatabase::class.java,
                     "task_database"
                 )
-                    .fallbackToDestructiveMigration(false)
+                    .fallbackToDestructiveMigration(true)
                     .build()
                 INSTANCE = instance
                 instance

@@ -24,9 +24,10 @@ import com.example.domain.usecase.SyncTasksUseCase
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity @Inject constructor(
-    private val syncTasksUseCase: SyncTasksUseCase
-) : ComponentActivity() {
+class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var syncTasksUseCase: SyncTasksUseCase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

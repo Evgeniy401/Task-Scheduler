@@ -2,104 +2,136 @@ package com.example.data.mapping
 
 import com.example.data.storage.PriorityData
 import com.example.data.storage.entity.TaskEntity
-import com.example.data.storage.entity.TaskRemoteEntity
-import com.example.domain.model.Task
+import com.example.data.storage.entity.CreateTaskDto
+import com.example.data.storage.entity.GetTaskDto
+import com.example.data.storage.entity.UpdateTaskDto
 import com.example.domain.model.PriorityDomain
+import com.example.domain.model.Task
+import java.time.LocalDateTime
+import java.time.format.DateTimeParseException
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class TaskDataMapper @Inject constructor() {
 
-    fun toData(domain: Task): TaskEntity {
+    fun toData(task: Task): TaskEntity {
         return TaskEntity(
-            id = if (domain.id == 0) 0 else domain.id,
-            title = domain.title,
-            body = domain.body,
-            priority = mapPriorityToData(domain.priorityDomain),
-            isCompleted = domain.isCompleted,
-            needsSync = domain.needsSync,
-            isDeleted = domain.isDeleted,
-            lastModified = domain.lastModified,
+            id = task.id,
+            title = task.title,
+            body = task.body,
+            priority = when (task.priorityDomain) {
+                PriorityDomain.HIGH -> PriorityData.HIGH
+                PriorityDomain.MAXIMUM -> PriorityData.MAXIMUM
+                PriorityDomain.STANDARD -> PriorityData.STANDARD
+                PriorityDomain.NONE -> PriorityData.NONE
+            },
+            isCompleted = task.isCompleted,
+            needsSync = task.needsSync,
+            isDeleted = task.isDeleted,
+            lastModified = task.lastModified,
+            createdAt = task.createdAt?.toString(),
+            updatedAt = task.updatedAt?.toString()
         )
     }
 
-    fun toDomain(data: TaskEntity): Task {
+    fun toDomain(entity: TaskEntity): Task {
         return Task(
-            id = data.id,
-            title = data.title,
-            body = data.body,
-            priorityDomain = mapPriorityToDomain(data.priority),
-            isCompleted = data.isCompleted,
-            needsSync = data.needsSync,
-            isDeleted = data.isDeleted,
-            lastModified = data.lastModified,
+            id = entity.id,
+            title = entity.title,
+            body = entity.body,
+            priorityDomain = when (entity.priority) {
+                PriorityData.HIGH -> PriorityDomain.HIGH
+                PriorityData.MAXIMUM -> PriorityDomain.MAXIMUM
+                PriorityData.STANDARD -> PriorityDomain.STANDARD
+                PriorityData.NONE -> PriorityDomain.NONE
+            },
+            isCompleted = entity.isCompleted,
+            needsSync = entity.needsSync,
+            isDeleted = entity.isDeleted,
+            lastModified = entity.lastModified,
+            createdAt = parseLocalDateTime(entity.createdAt),
+            updatedAt = parseLocalDateTime(entity.updatedAt)
         )
     }
 
-    private fun mapPriorityToData(priorityDomain: PriorityDomain): PriorityData {
-        return when (priorityDomain) {
-            PriorityDomain.STANDARD -> PriorityData.STANDARD
-            PriorityDomain.HIGH -> PriorityData.HIGH
-            PriorityDomain.MAXIMUM -> PriorityData.MAXIMUM
-            PriorityDomain.NONE -> PriorityData.NONE
+    fun toDomainList(entities: List<TaskEntity>): List<Task> {
+        return entities.map { toDomain(it) }
+    }
+
+    fun toCreateDto(task: Task): CreateTaskDto {
+
+        val priorityString = when (task.priorityDomain) {
+            PriorityDomain.STANDARD -> "STANDARD"
+            PriorityDomain.HIGH -> "HIGH"
+            PriorityDomain.MAXIMUM -> "MAXIMUM"
+            PriorityDomain.NONE -> "NONE"
         }
-    }
 
-    private fun mapPriorityToDomain(priorityData: PriorityData): PriorityDomain {
-        return when (priorityData) {
-            PriorityData.STANDARD -> PriorityDomain.STANDARD
-            PriorityData.HIGH -> PriorityDomain.HIGH
-            PriorityData.MAXIMUM -> PriorityDomain.MAXIMUM
-            PriorityData.NONE -> PriorityDomain.NONE
-        }
-    }
-
-    fun toDataList(domains: List<Task>): List<TaskEntity> {
-        return domains.map { toData(it) }
-    }
-
-    fun toDomainList(dataList: List<TaskEntity>): List<Task> {
-        return dataList.map { toDomain(it) }
-    }
-
-    fun toRemoteEntity(domain: Task): TaskRemoteEntity {
-        return TaskRemoteEntity(
-            id = if (domain.id == 0) null else domain.id,
-            title = domain.title,
-            body = domain.body,
-            priority = mapPriorityToRemote(domain.priorityDomain),
-            isCompleted = domain.isCompleted
+        return CreateTaskDto(
+            title = task.title,
+            body = task.body,
+            priority = priorityString,
+            isCompleted = task.isCompleted
         )
     }
 
-    fun toDomain(remote: TaskRemoteEntity): Task {
+    fun toUpdateDto(task: Task): UpdateTaskDto {
+
+        val priorityString = when (task.priorityDomain) {
+            PriorityDomain.STANDARD -> "STANDARD"
+            PriorityDomain.HIGH -> "HIGH"
+            PriorityDomain.MAXIMUM -> "MAXIMUM"
+            PriorityDomain.NONE -> "NONE"
+        }
+
+        return UpdateTaskDto(
+            title = task.title,
+            body = task.body,
+            priority = priorityString,
+            isCompleted = task.isCompleted
+        )
+    }
+
+    fun fromRemote(dto: GetTaskDto): Task {
+
+        val priorityDomain = try {
+            PriorityDomain.valueOf(dto.priority.uppercase())
+        } catch (e: IllegalArgumentException) {
+            PriorityDomain.NONE
+        }
+
         return Task(
-            id = remote.id ?: 0,
-            title = remote.title,
-            body = remote.body,
-            priorityDomain = mapPriorityToDomainFromRemote(remote.priority),
-            isCompleted = remote.isCompleted
+            id = dto.id,
+            title = dto.title,
+            body = dto.body,
+            priorityDomain = priorityDomain,
+            isCompleted = dto.isCompleted,
+            needsSync = false,
+            isDeleted = false,
+            lastModified = System.currentTimeMillis(),
+            createdAt = parseLocalDateTime(dto.createdAt),
+            updatedAt = parseLocalDateTime(dto.updatedAt)
         )
     }
 
-    fun toDomainListFromRemote(remoteList: List<TaskRemoteEntity>): List<Task> {
-        return remoteList.map { toDomain(it) }
+    fun fromRemoteList(dtos: List<GetTaskDto>): List<Task> {
+        return dtos.map { fromRemote(it) }
     }
 
-    private fun mapPriorityToRemote(priorityDomain: PriorityDomain): String {
-        return when (priorityDomain) {
-            PriorityDomain.STANDARD -> "standard"
-            PriorityDomain.HIGH -> "high"
-            PriorityDomain.MAXIMUM -> "maximum"
-            PriorityDomain.NONE -> "none"
-        }
-    }
+    private fun parseLocalDateTime(dateString: String?): LocalDateTime? {
+        if (dateString == null) return null
 
-    private fun mapPriorityToDomainFromRemote(priorityString: String): PriorityDomain {
-        return when (priorityString.lowercase()) {
-            "standard" -> PriorityDomain.STANDARD
-            "high" -> PriorityDomain.HIGH
-            "maximum" -> PriorityDomain.MAXIMUM
-            else -> PriorityDomain.NONE
+        return try {
+            LocalDateTime.parse(dateString)
+        } catch (e: DateTimeParseException) {
+
+            try {
+                val cleaned = dateString.replace("Z$".toRegex(), "")
+                LocalDateTime.parse(cleaned)
+            } catch (e2: Exception) {
+                null
+            }
         }
     }
 }

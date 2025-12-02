@@ -6,6 +6,8 @@ import com.example.data.mapping.TaskDataMapper
 import com.example.data.network.NetworkManager
 import com.example.data.network.TaskApi
 import com.example.data.storage.dao.TaskDao
+import com.example.data.storage.entity.CreateTaskDto
+import com.example.data.storage.entity.UpdateTaskDto
 import com.example.domain.model.Task
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -25,14 +27,16 @@ class TaskStorageImpl @Inject constructor(
 
     override suspend fun saveToServer(task: Task): Task {
         return try {
-            val remoteEntity = mapper.toRemoteEntity(task)
-            val response = taskApi.createTask(remoteEntity)
-            val savedTask = mapper.toDomain(response)
+
+            val createDto: CreateTaskDto = mapper.toCreateDto(task)
+
+            val response = taskApi.createTask(createDto)
+
+            val savedTask = mapper.fromRemote(response)
 
             taskDao.insertTask(mapper.toData(savedTask))
             savedTask
         } catch (e: Exception) {
-
             val localTask = task.copy(needsSync = true)
             taskDao.insertTask(mapper.toData(localTask))
             localTask
@@ -47,7 +51,7 @@ class TaskStorageImpl @Inject constructor(
 
     override suspend fun getAllTasksFromServer(): List<Task> {
         val remoteTasks = taskApi.getAllTasks()
-        return mapper.toDomainListFromRemote(remoteTasks)
+        return mapper.fromRemoteList(remoteTasks)
     }
 
     override suspend fun deleteTask(taskId: Int) {
@@ -57,6 +61,7 @@ class TaskStorageImpl @Inject constructor(
     override suspend fun deleteTaskFromServer(taskId: Int) {
         try {
             taskApi.deleteTask(taskId)
+            taskDao.deleteTaskById(taskId)
         } catch (e: Exception) {
 
             val task = taskDao.getTaskById(taskId)
@@ -70,8 +75,19 @@ class TaskStorageImpl @Inject constructor(
     override suspend fun completeTask(taskId: Int) {
         val task = taskDao.getTaskById(taskId)
         task?.let {
-            val completedTask = it.copy(isCompleted = true)
+
+            val completedTask = it.copy(isCompleted = true, needsSync = true)
             taskDao.insertTask(completedTask)
+
+            try {
+
+                val domainTask = mapper.toDomain(completedTask)
+                val updateDto: UpdateTaskDto = mapper.toUpdateDto(domainTask)
+                taskApi.updateTask(taskId, updateDto)
+
+                val syncedTask = completedTask.copy(needsSync = false)
+                taskDao.insertTask(syncedTask)
+            } catch (e: Exception) {}
         }
     }
 
@@ -82,7 +98,6 @@ class TaskStorageImpl @Inject constructor(
         try {
             val serverTasks = getAllTasksFromServer()
             serverTasks.forEach { serverTask ->
-
                 taskDao.insertTask(mapper.toData(serverTask))
             }
         } catch (e: Exception) {
@@ -92,6 +107,8 @@ class TaskStorageImpl @Inject constructor(
         val unsyncedTasks = taskDao.getUnsyncedTasks()
         unsyncedTasks.forEach { taskEntity ->
             try {
+                val domainTask = mapper.toDomain(taskEntity)
+
                 if (taskEntity.isDeleted) {
 
                     if (taskEntity.id > 0) {
@@ -100,19 +117,21 @@ class TaskStorageImpl @Inject constructor(
                     taskDao.deleteTask(taskEntity)
                 } else {
 
-                    val remoteEntity = mapper.toRemoteEntity(mapper.toDomain(taskEntity))
                     val response = if (taskEntity.id > 0) {
-                        taskApi.updateTask(taskEntity.id, remoteEntity)
+
+                        val updateDto: UpdateTaskDto = mapper.toUpdateDto(domainTask)
+                        taskApi.updateTask(taskEntity.id, updateDto)
                     } else {
-                        taskApi.createTask(remoteEntity)
+
+                        val createDto: CreateTaskDto = mapper.toCreateDto(domainTask)
+                        taskApi.createTask(createDto)
                     }
 
-                    val updatedEntity = mapper.toData(mapper.toDomain(response))
+                    val updatedEntity = mapper.toData(mapper.fromRemote(response))
                         .copy(needsSync = false, isDeleted = false)
                     taskDao.insertTask(updatedEntity)
                 }
-            } catch (e: Exception) {
-            }
+            } catch (e: Exception) {}
         }
     }
 
