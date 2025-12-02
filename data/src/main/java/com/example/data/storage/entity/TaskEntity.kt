@@ -14,6 +14,8 @@ data class TaskEntity(
     val isCompleted: Boolean = false,
     val needsSync: Boolean = false,
     val isDeleted: Boolean = false,
-    val lastModified: Long = System.currentTimeMillis()
+    val lastModified: Long = System.currentTimeMillis(),
+    val createdAt: String? = null,
+    val updatedAt: String? = null
 )
 

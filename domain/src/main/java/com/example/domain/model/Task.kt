@@ -1,5 +1,7 @@
 package com.example.domain.model
 
+import java.time.LocalDateTime
+
 data class Task(
     val id: Int = 0,
     val title: String,
@@ -8,7 +10,9 @@ data class Task(
     val isCompleted: Boolean = false,
     val needsSync: Boolean = false,
     val isDeleted: Boolean = false,
-    val lastModified: Long = System.currentTimeMillis()
+    val lastModified: Long = System.currentTimeMillis(),
+    val createdAt: LocalDateTime? = null,
+    val updatedAt: LocalDateTime? = null,
 ) {
     fun getPriorityValue(): Int {
         return when (priorityDomain) {
@@ -20,7 +24,26 @@ data class Task(
     }
 }
 
-enum class PriorityDomain{
-    STANDARD, HIGH, MAXIMUM, NONE
+enum class PriorityDomain {
+    STANDARD, HIGH, MAXIMUM, NONE;
+
+    companion object {
+        fun fromString(value: String): PriorityDomain {
+            return try {
+                valueOf(value.uppercase())
+            } catch (e: IllegalArgumentException) {
+                NONE
+            }
+        }
+
+        fun toString(priority: PriorityDomain): String {
+            return when (priority) {
+                STANDARD -> "STANDARD"
+                HIGH -> "HIGH"
+                MAXIMUM -> "MAXIMUM"
+                NONE -> "NONE"
+            }
+        }
+    }
 }
 
