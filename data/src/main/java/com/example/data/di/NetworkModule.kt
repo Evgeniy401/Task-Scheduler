@@ -21,7 +21,7 @@ object NetworkModule {
     @Singleton
     fun provideTaskApi(): TaskApi {
         return Retrofit.Builder()
-            .baseUrl("https://your-api-url.com/") // Заменить на реальный URL
+            .baseUrl("http://10.0.2.2:8081")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(TaskApi::class.java)
