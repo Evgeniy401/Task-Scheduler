@@ -27,19 +27,19 @@ class TaskStorageImpl @Inject constructor(
 
     override suspend fun saveToServer(task: Task): Task {
         return try {
-
             val createDto: CreateTaskDto = mapper.toCreateDto(task)
-
             val response = taskApi.createTask(createDto)
-
             val savedTask = mapper.fromRemote(response)
 
-            taskDao.insertTask(mapper.toData(savedTask))
+            val savedEntity = mapper.toData(savedTask)
+            taskDao.insertTask(savedEntity.copy(needsSync = false))
             savedTask
+
         } catch (e: Exception) {
-            val localTask = task.copy(needsSync = true)
-            taskDao.insertTask(mapper.toData(localTask))
-            localTask
+            val taskWithSync = task.copy(needsSync = true)
+            val entity = mapper.toData(taskWithSync)
+            taskDao.insertTask(entity)
+            taskWithSync
         }
     }
 
