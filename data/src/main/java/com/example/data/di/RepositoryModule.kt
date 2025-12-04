@@ -1,6 +1,8 @@
 package com.example.data.di
 
+import com.example.data.repository.StatisticRepositoryImpl
 import com.example.data.repository.TaskRepositoryImpl
+import com.example.domain.repository.StatisticRepository
 import com.example.domain.repository.TaskRepository
 import dagger.Binds
 import dagger.Module
@@ -17,4 +19,10 @@ abstract class RepositoryModule {
     abstract fun bindTaskRepository(
         taskRepositoryImpl: TaskRepositoryImpl
     ): TaskRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindStatisticRepository(
+        statisticRepositoryImpl: StatisticRepositoryImpl
+    ): StatisticRepository
 }

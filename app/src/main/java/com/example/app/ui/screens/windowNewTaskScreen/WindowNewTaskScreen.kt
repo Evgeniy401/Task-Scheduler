@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -61,9 +62,7 @@ fun WindowNewTaskScreen(
         }
     }
 
-    val textStateLabel by viewModel.textStateLabel.collectAsState()
-    val textStateBody by viewModel.textStateDescription.collectAsState()
-    val selectedPriority by viewModel.selectedPriority.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
@@ -73,7 +72,10 @@ fun WindowNewTaskScreen(
                     onBack()
                 }
                 is WindowNewTaskScreenViewModel.NavigationEvent.ShowValidationError -> {
-                    snackbarHostState.showSnackbar("Заполните необходимые поля")
+                    snackbarHostState.showSnackbar("Заполните название задачи")
+                }
+                is WindowNewTaskScreenViewModel.NavigationEvent.ShowError -> {
+                    snackbarHostState.showSnackbar(event.message)
                 }
             }
         }
@@ -127,9 +129,7 @@ fun WindowNewTaskScreen(
                         )
                     }
                     GeneralButton(
-                        onClick = {
-                            onBack()
-                        }
+                        onClick = { onBack() },
                     ) {
                         Text(
                             text = "Назад",
@@ -140,95 +140,96 @@ fun WindowNewTaskScreen(
             }
         }
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .statusBarsPadding()
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top,
         ) {
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                value = textStateLabel,
-                onValueChange = { newTextLabel ->
-                    viewModel.updateTextLabel(newTextLabel)
-                },
-                shape = RoundedCornerShape(10.dp),
-                label = { Text(text = "Название задачи") },
-                singleLine = true,
-            )
-
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                value = textStateBody,
-                onValueChange = { newTextDescription ->
-                    viewModel.updateTextDescription(newTextDescription)
-                },
-                shape = RoundedCornerShape(10.dp),
-                label = { Text(text = "Содержание задачи") },
-                maxLines = 12,
-            )
-
-            Box(
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .wrapContentSize(Alignment.TopCenter),
-            ) {
-                Button(
-                    onClick = {
-                        isExpanded = !isExpanded
-                    },
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else {
+                Column(
                     modifier = Modifier
-                        .wrapContentWidth(),
-                    shape = RoundedCornerShape(10.dp)
+                        .fillMaxSize()
+                        .statusBarsPadding()
+                        .padding(horizontal = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top,
                 ) {
-                    Text(
-                        text = getPriorityText(selectedPriority, includePrefix = true)
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        value = uiState.title,
+                        onValueChange = { newTitle ->
+                            viewModel.updateTitle(newTitle)
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        label = { Text(text = "Название задачи") },
+                        singleLine = true,
                     )
-                    Icon(
-                        imageVector = if (isExpanded) Icons.Default.ArrowDropUp
-                        else Icons.Default.ArrowDropDown,
-                        contentDescription = stringResource(R.string.open_menu)
+
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        value = uiState.description,
+                        onValueChange = { newDescription ->
+                            viewModel.updateDescription(newDescription)
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        label = { Text(text = "Содержание задачи") },
+                        maxLines = 12,
                     )
-                }
-                DropdownMenu(
-                    expanded = isExpanded,
-                    onDismissRequest = {
-                        isExpanded = false
-                    },
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .align(Alignment.Center),
-                ) {
-                    priorities.forEach { priority ->
-                        DropdownMenuItem(
-                            onClick = {
-                                viewModel.updateSelectedPriority(priority)
-                                isExpanded = false
-                            },
-                            text = {
-                                Text(
-                                    text = getPriorityText(priority, includePrefix = false),
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.fillMaxWidth(),
+
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .wrapContentSize(Alignment.TopCenter),
+                    ) {
+                        Button(
+                            onClick = { isExpanded = !isExpanded },
+                            modifier = Modifier.wrapContentWidth(),
+                            shape = RoundedCornerShape(10.dp),
+                        ) {
+                            Text(
+                                text = getPriorityText(uiState.selectedPriority, includePrefix = true)
+                            )
+                            Icon(
+                                imageVector = if (isExpanded) Icons.Default.ArrowDropUp
+                                else Icons.Default.ArrowDropDown,
+                                contentDescription = stringResource(R.string.open_menu)
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = isExpanded,
+                            onDismissRequest = { isExpanded = false }
+                        ) {
+                            priorities.forEach { priority ->
+                                DropdownMenuItem(
+                                    onClick = {
+                                        viewModel.updateSelectedPriority(priority)
+                                        isExpanded = false
+                                    },
+                                    text = {
+                                        Text(
+                                            text = getPriorityText(priority, includePrefix = false),
+                                            textAlign = TextAlign.Center,
+                                            modifier = Modifier.fillMaxWidth(),
+                                        )
+                                    }
                                 )
                             }
-                        )
+                        }
                     }
+                    Spacer(modifier = Modifier.weight(1f))
                 }
             }
-            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
-
-
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
