@@ -18,22 +18,18 @@ class TaskRepositoryImpl @Inject constructor(
 
     @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
     override suspend fun saveTask(task: Task): Task {
-
-        return if (networkManager.isConnected()) {
+        if (networkManager.isConnected()) {
             try {
-
-                taskStorage.saveToServer(task)
+                return taskStorage.saveToServer(task)
             } catch (e: Exception) {
-
                 val taskWithSync = task.copy(needsSync = true)
                 taskStorage.save(taskWithSync)
-                taskWithSync
+                return taskWithSync
             }
         } else {
-
             val taskWithSync = task.copy(needsSync = true)
             taskStorage.save(taskWithSync)
-            taskWithSync
+            return taskWithSync
         }
     }
 

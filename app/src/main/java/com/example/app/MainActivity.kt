@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
@@ -83,10 +84,12 @@ fun AppNavHost(
                 onNavigateToStatistic = {
                     navController.navigate("statistic")
                 },
-
                 onNavigateToWindowNewTask = {
-                    navController.navigate("newTask")
+                    navController.navigate("newTask/create")
                 },
+                onNavigateToEditTask = { taskId ->
+                    navController.navigate("newTask/edit/$taskId")
+                }
             )
         }
 
@@ -98,12 +101,31 @@ fun AppNavHost(
             )
         }
 
-        composable("newTask") {
+        composable("newTask/create") {
             WindowNewTaskScreen(
-               onBack = {
+                taskId = null,
+                onBack = {
                     navController.popBackStack()
-                },
+                }
             )
+        }
+
+        composable("newTask/edit/{taskId}") { backStackEntry ->
+            val taskIdString = backStackEntry.arguments?.getString("taskId")
+            val taskId = taskIdString?.toIntOrNull()
+
+            if (taskId != null) {
+                WindowNewTaskScreen(
+                    taskId = taskId,
+                    onBack = {
+                        navController.popBackStack()
+                    }
+                )
+            } else {
+                LaunchedEffect(Unit) {
+                    navController.popBackStack()
+                }
+            }
         }
     }
 }

@@ -51,9 +51,16 @@ import com.example.domain.model.PriorityDomain
 
 @Composable
 fun WindowNewTaskScreen(
+    taskId: Int? = null,
     onBack: () -> Unit,
     viewModel: WindowNewTaskScreenViewModel = hiltViewModel()
 ) {
+    if (taskId != null) {
+        LaunchedEffect(taskId) {
+            viewModel.loadTaskForEdit(taskId)
+        }
+    }
+
     val textStateLabel by viewModel.textStateLabel.collectAsState()
     val textStateBody by viewModel.textStateDescription.collectAsState()
     val selectedPriority by viewModel.selectedPriority.collectAsState()
@@ -107,11 +114,15 @@ fun WindowNewTaskScreen(
                 ) {
                     GeneralButton(
                         onClick = {
-                            viewModel.saveTask()
+                            if (taskId != null) {
+                                viewModel.updateTask(taskId)
+                            } else {
+                                viewModel.saveTask()
+                            }
                         }
                     ) {
                         Text(
-                            text = "Сохранить задачу",
+                            text = if (taskId != null) "Сохранить изменения" else "Сохранить задачу",
                             fontSize = 20.sp,
                         )
                     }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -28,11 +29,11 @@ import com.example.domain.model.PriorityDomain
 import com.example.domain.model.Task
 
 val task1 = Task(
-id = 1,
-title = "Помыть машину",
-body = "Это очень длинное описание задачи, которое занимает несколько строк и должно автоматически увеличивать высоту карточки в зависимости от объема текста",
-priorityDomain = PriorityDomain.STANDARD,
-isCompleted = false
+    id = 1,
+    title = "Помыть машину",
+    body = "Это очень длинное описание задачи, которое занимает несколько строк и должно автоматически увеличивать высоту карточки в зависимости от объема текста",
+    priorityDomain = PriorityDomain.STANDARD,
+    isCompleted = false
 )
 
 @Composable
@@ -41,6 +42,7 @@ fun TaskCard(
     onCompleteTask: (Int) -> Unit,
     onDeleteTask: (Int) -> Unit,
     taskMapper: TaskDomainUiMapper,
+    onEditTask: (Int) -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -96,10 +98,19 @@ fun TaskCard(
                         )
                     }
 
-                    Spacer(
+                    IconButton(
                         modifier = Modifier
-                            .padding(start = 10.dp)
-                    )
+                            .weight(1f)
+                            .padding(horizontal = 4.dp),
+                        onClick = { onEditTask(task.id) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Редактировать задачу",
+                            modifier = Modifier.size(25.dp),
+                            tint = Color.Blue
+                        )
+                    }
 
                     IconButton(
                         modifier = Modifier
@@ -129,5 +140,6 @@ fun CompletedTaskCardPreview() {
         onCompleteTask = {},
         onDeleteTask = {},
         taskMapper = TaskDomainUiMapper(),
+        onEditTask = {},
     )
 }
