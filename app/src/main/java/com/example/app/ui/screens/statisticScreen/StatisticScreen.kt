@@ -22,11 +22,20 @@ import androidx.compose.ui.unit.sp
 import com.example.app.ui.components.GeneralButton
 import com.example.app.ui.theme.TaskSchedulerTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.material3.CircularProgressIndicator
 
 @Composable
 fun StatisticScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    viewModel: StatisticViewModel = hiltViewModel()
 ) {
+
+    val uiState by viewModel.uiState.collectAsState()
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
@@ -43,7 +52,7 @@ fun StatisticScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     GeneralButton(
-                        onClick = {}
+                        onClick = { viewModel.resetStatistics() }
                     ) {
                         Text(
                             text = "Сбросить статистику",
@@ -69,49 +78,45 @@ fun StatisticScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 130.dp)
-                    .statusBarsPadding()
-                    .padding(horizontal = 40.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 130.dp)
+                        .statusBarsPadding()
+                        .padding(horizontal = 40.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                 ) {
-                    Text(text = "Создано задач")
-                    Text(text = "10")
+                    StatRow("Создано задач", uiState.totalTasksCreated.toString())
+                    StatRow("Текущих задач", uiState.currentTasks.toString())
+                    StatRow("Выполнено", uiState.completedTasks.toString())
+                    StatRow("Отменено", uiState.cancelledTasks.toString())
+                    StatRow("Процент выполнения", "${uiState.completionPercentage}%")
                 }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(text = "Выполнено")
-                    Text(text = "45")
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(text = "Отменено")
-                    Text(text = "34")
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(text = "Процент выполенения")
-                    Text(text = "87%")
-                }
-
             }
         }
+    }
+}
+
+@Composable
+fun StatRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.headlineSmall
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.headlineSmall
+        )
     }
 }
 
