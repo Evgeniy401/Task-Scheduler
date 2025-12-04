@@ -36,6 +36,7 @@ import com.example.domain.model.Task
 fun MainScreen (
     onNavigateToStatistic: () -> Unit,
     onNavigateToWindowNewTask: () -> Unit,
+    onNavigateToEditTask: (taskId: Int) -> Unit,
     viewModel: MainScreenViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -74,6 +75,10 @@ fun MainScreen (
             tasks = uiState.tasks,
             onDeleteTask = viewModel::showDeleteConfirmation,
             onCompleteTask = viewModel::showCompleteConfirmation,
+            onEditTask = { taskId ->
+                viewModel.setTaskForEdit(taskId)
+                onNavigateToEditTask(taskId)
+            },
             taskMapper = viewModel.taskMapper
         )
     }
@@ -134,6 +139,7 @@ private fun TaskList(
     tasks: List<MainScreenState.TaskItem> = emptyList(),
     onCompleteTask: (Int) -> Unit = {},
     onDeleteTask: (Int) -> Unit = {},
+    onEditTask: (Int) -> Unit = {},
     taskMapper: TaskDomainUiMapper
 ) {
     val groupedTasks = remember(tasks) {
@@ -156,6 +162,7 @@ private fun TaskList(
                     task = task.toDomainTask(),
                     onCompleteTask = onCompleteTask,
                     onDeleteTask = onDeleteTask,
+                    onEditTask = onEditTask,
                     taskMapper = taskMapper
                 )
             }
@@ -196,6 +203,7 @@ fun MainScreenPreview() {
         MainScreen(
             onNavigateToStatistic = {},
             onNavigateToWindowNewTask = {},
+            onNavigateToEditTask = {}
             // мок маппер
         )
     }

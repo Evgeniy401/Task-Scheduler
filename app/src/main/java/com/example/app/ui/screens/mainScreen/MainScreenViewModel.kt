@@ -3,9 +3,11 @@ package com.example.app.ui.screens.mainScreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.app.mapping.TaskDomainUiMapper
+import com.example.domain.model.Task
 import com.example.domain.repository.TaskRepository
 import com.example.domain.usecase.CompleteTaskUseCase
 import com.example.domain.usecase.DeleteTaskUseCase
+import com.example.domain.usecase.EditTaskUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,11 +23,15 @@ class MainScreenViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val deleteTaskUseCase: DeleteTaskUseCase,
     private val completeTaskUseCase: CompleteTaskUseCase,
+    private val editTaskUseCase: EditTaskUseCase,
     val taskMapper: TaskDomainUiMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MainScreenState())
     val uiState: StateFlow<MainScreenState> = _uiState.asStateFlow()
+
+    private val _taskToEdit = MutableStateFlow<Task?>(null)
+    val taskToEdit: StateFlow<Task?> = _taskToEdit.asStateFlow()
 
     init {
         loadTasks()
@@ -40,6 +46,33 @@ class MainScreenViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope)
+    }
+
+    fun setTaskForEdit(taskId: Int) {
+        viewModelScope.launch {
+            val task = taskRepository.getTaskById(taskId)
+            _taskToEdit.value = task
+        }
+    }
+
+    fun clearTaskForEdit() {
+        _taskToEdit.value = null
+    }
+
+    fun editTask(
+        taskId: Int,
+        title: String,
+        body: String,
+        priorityDomain: com.example.domain.model.PriorityDomain
+    ) {
+        viewModelScope.launch {
+            editTaskUseCase(
+                taskId = taskId,
+                title = title,
+                body = body,
+                priorityDomain = priorityDomain
+            )
+        }
     }
 
     fun showDeleteConfirmation(taskId: Int) {

@@ -27,13 +27,25 @@ class TaskStorageImpl @Inject constructor(
 
     override suspend fun saveToServer(task: Task): Task {
         return try {
-            val createDto: CreateTaskDto = mapper.toCreateDto(task)
-            val response = taskApi.createTask(createDto)
-            val savedTask = mapper.fromRemote(response)
 
-            val savedEntity = mapper.toData(savedTask)
-            taskDao.insertTask(savedEntity.copy(needsSync = false))
-            savedTask
+            if (task.id > 0) {
+                val updateDto: UpdateTaskDto = mapper.toUpdateDto(task)
+                val response = taskApi.updateTask(task.id, updateDto)
+                val updatedTask = mapper.fromRemote(response)
+
+                val updatedEntity = mapper.toData(updatedTask).copy(needsSync = false)
+                taskDao.insertTask(updatedEntity)
+                updatedTask
+
+            } else {
+                val createDto: CreateTaskDto = mapper.toCreateDto(task)
+                val response = taskApi.createTask(createDto)
+                val savedTask = mapper.fromRemote(response)
+
+                val savedEntity = mapper.toData(savedTask).copy(needsSync = false)
+                taskDao.insertTask(savedEntity)
+                savedTask
+            }
 
         } catch (e: Exception) {
             val taskWithSync = task.copy(needsSync = true)
@@ -80,7 +92,6 @@ class TaskStorageImpl @Inject constructor(
             taskDao.insertTask(completedTask)
 
             try {
-
                 val domainTask = mapper.toDomain(completedTask)
                 val updateDto: UpdateTaskDto = mapper.toUpdateDto(domainTask)
                 taskApi.updateTask(taskId, updateDto)
