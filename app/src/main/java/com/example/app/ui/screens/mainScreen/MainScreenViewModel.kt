@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.app.mapping.TaskDomainUiMapper
 import com.example.domain.model.Task
-import com.example.domain.repository.TaskRepository
 import com.example.domain.usecase.CompleteTaskUseCase
 import com.example.domain.usecase.DeleteTaskUseCase
 import com.example.domain.usecase.EditTaskUseCase
+import com.example.domain.usecase.GetActiveTasksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,13 +17,15 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.domain.usecase.GetTaskByIdUseCase
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
-    private val taskRepository: TaskRepository,
     private val deleteTaskUseCase: DeleteTaskUseCase,
     private val completeTaskUseCase: CompleteTaskUseCase,
     private val editTaskUseCase: EditTaskUseCase,
+    private val getActiveTasksUseCase: GetActiveTasksUseCase,
+    private val getTaskByIdUseCase: GetTaskByIdUseCase,
     val taskMapper: TaskDomainUiMapper
 ) : ViewModel() {
 
@@ -38,9 +40,9 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun loadTasks() {
-        taskRepository.getAllTasks()
+        getActiveTasksUseCase()
             .onEach { tasks ->
-                val taskItems = taskMapper.toUiState(tasks)
+                val taskItems = taskMapper.toUiList(tasks)
                 _uiState.update { currentState ->
                     currentState.copy(tasks = taskItems)
                 }
@@ -50,7 +52,7 @@ class MainScreenViewModel @Inject constructor(
 
     fun setTaskForEdit(taskId: Int) {
         viewModelScope.launch {
-            val task = taskRepository.getTaskById(taskId)
+            val task = getTaskByIdUseCase(taskId)
             _taskToEdit.value = task
         }
     }

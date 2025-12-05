@@ -6,18 +6,18 @@ import com.example.domain.repository.TaskRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 
 class CalculateStatisticUseCase @Inject constructor(
-    private val statisticRepository: StatisticRepository,
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
+    private val statisticRepository: StatisticRepository
 ) {
-
     operator fun invoke(): Flow<Pair<StatisticDomainModel?, Int>> {
         return combine(
             statisticRepository.getStatistic(),
-            taskRepository.getAllTasks()
-        ) { domainModel, currentTasks ->
-            domainModel to currentTasks.size
+            taskRepository.getActiveTasks().map { it.size }
+        ) { statistic, activeTasksCount ->
+            Pair(statistic, activeTasksCount)
         }
     }
 }

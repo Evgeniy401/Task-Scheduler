@@ -23,6 +23,12 @@ class TaskStorageImpl @Inject constructor(
         }
     }
 
+    override fun getActiveTasks(): Flow<List<Task>> {
+        return taskDao.getActiveTasks().map { entities ->
+            mapper.toDomainList(entities)
+        }
+    }
+
     override suspend fun deleteTask(taskId: Int) {
         taskDao.deleteTaskById(taskId)
     }
