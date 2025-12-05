@@ -61,6 +61,14 @@ class StatisticViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    fun showResetConfirmation() {
+        _uiState.update {
+            it.copy(
+                showConfirmationDialog = true
+            )
+        }
+    }
+
     fun resetStatistics() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -78,6 +86,15 @@ class StatisticViewModel @Inject constructor(
             }
         }
     }
+
+    fun confirmReset() {
+        _uiState.update { it.copy(showConfirmationDialog = false) }
+        resetStatistics()
+    }
+
+    fun cancelReset() {
+        _uiState.update { it.copy(showConfirmationDialog = false) }
+    }
 }
 
 data class StatisticScreenState(
@@ -87,5 +104,6 @@ data class StatisticScreenState(
     val cancelledTasks: Int = 0,
     val completionPercentage: Float = 0f,
     val isLoading: Boolean = false,
+    val showConfirmationDialog: Boolean = false,
     val errorMessage: String? = null
 )
