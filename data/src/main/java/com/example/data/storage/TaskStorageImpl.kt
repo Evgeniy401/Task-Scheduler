@@ -27,7 +27,6 @@ class TaskStorageImpl @Inject constructor(
 
     override suspend fun saveToServer(task: Task): Task {
         return try {
-
             if (task.id > 0) {
                 val updateDto: UpdateTaskDto = mapper.toUpdateDto(task)
                 val response = taskApi.updateTask(task.id, updateDto)
@@ -46,12 +45,9 @@ class TaskStorageImpl @Inject constructor(
                 taskDao.insertTask(savedEntity)
                 savedTask
             }
-
         } catch (e: Exception) {
-            val taskWithSync = task.copy(needsSync = true)
-            val entity = mapper.toData(taskWithSync)
-            taskDao.insertTask(entity)
-            taskWithSync
+
+            throw e
         }
     }
 
@@ -72,7 +68,10 @@ class TaskStorageImpl @Inject constructor(
 
     override suspend fun deleteTaskFromServer(taskId: Int) {
         try {
-            taskApi.deleteTask(taskId)
+            if (taskId > 0) {
+                taskApi.deleteTask(taskId)
+            }
+
             taskDao.deleteTaskById(taskId)
         } catch (e: Exception) {
 
@@ -81,24 +80,16 @@ class TaskStorageImpl @Inject constructor(
                 val markedForDeletion = it.copy(isDeleted = true, needsSync = true)
                 taskDao.insertTask(markedForDeletion)
             }
+            throw e
         }
     }
 
     override suspend fun completeTask(taskId: Int) {
+
         val task = taskDao.getTaskById(taskId)
         task?.let {
-
             val completedTask = it.copy(isCompleted = true, needsSync = true)
             taskDao.insertTask(completedTask)
-
-            try {
-                val domainTask = mapper.toDomain(completedTask)
-                val updateDto: UpdateTaskDto = mapper.toUpdateDto(domainTask)
-                taskApi.updateTask(taskId, updateDto)
-
-                val syncedTask = completedTask.copy(needsSync = false)
-                taskDao.insertTask(syncedTask)
-            } catch (e: Exception) {}
         }
     }
 
@@ -108,12 +99,21 @@ class TaskStorageImpl @Inject constructor(
 
         try {
             val serverTasks = getAllTasksFromServer()
-            serverTasks.forEach { serverTask ->
-                taskDao.insertTask(mapper.toData(serverTask))
+            val serverTasksMap = serverTasks.associateBy { it.id }
+            val localTasks = taskDao.getAllTasksSync()
+
+            for (localTask in localTasks) {
+                val serverTask = serverTasksMap[localTask.id]
+
+                if (serverTask != null) {
+                    val localDomain = mapper.toDomain(localTask)
+                    if (serverTask.lastModified > localDomain.lastModified && !localTask.needsSync) {
+                        taskDao.insertTask(mapper.toData(serverTask))
+                    }
+
+                } else if (!localTask.isDeleted) {}
             }
-        } catch (e: Exception) {
-            return
-        }
+        } catch (e: Exception) {}
 
         val unsyncedTasks = taskDao.getUnsyncedTasks()
         unsyncedTasks.forEach { taskEntity ->
@@ -125,21 +125,24 @@ class TaskStorageImpl @Inject constructor(
                     if (taskEntity.id > 0) {
                         taskApi.deleteTask(taskEntity.id)
                     }
+
                     taskDao.deleteTask(taskEntity)
-                } else {
 
-                    val response = if (taskEntity.id > 0) {
-
-                        val updateDto: UpdateTaskDto = mapper.toUpdateDto(domainTask)
-                        taskApi.updateTask(taskEntity.id, updateDto)
-                    } else {
-
-                        val createDto: CreateTaskDto = mapper.toCreateDto(domainTask)
-                        taskApi.createTask(createDto)
-                    }
-
+                } else if (taskEntity.id > 0) {
+                    val updateDto: UpdateTaskDto = mapper.toUpdateDto(domainTask)
+                    val response = taskApi.updateTask(taskEntity.id, updateDto)
                     val updatedEntity = mapper.toData(mapper.fromRemote(response))
                         .copy(needsSync = false, isDeleted = false)
+                    taskDao.insertTask(updatedEntity)
+
+                } else {
+                    val createDto: CreateTaskDto = mapper.toCreateDto(domainTask)
+                    val response = taskApi.createTask(createDto)
+                    val remoteTask = mapper.fromRemote(response)
+                    val updatedEntity = mapper.toData(remoteTask)
+                        .copy(needsSync = false, isDeleted = false)
+
+                    taskDao.deleteTask(taskEntity)
                     taskDao.insertTask(updatedEntity)
                 }
             } catch (e: Exception) {}

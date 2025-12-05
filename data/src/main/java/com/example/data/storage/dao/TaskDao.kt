@@ -30,5 +30,8 @@ interface TaskDao {
 
     @Query("SELECT * FROM tasks WHERE isDeleted = 1")
     suspend fun getDeletedTasks(): List<TaskEntity>
+
+    @Query("SELECT * FROM tasks WHERE isDeleted = 0")
+    suspend fun getAllTasksSync(): List<TaskEntity>
 }
 
