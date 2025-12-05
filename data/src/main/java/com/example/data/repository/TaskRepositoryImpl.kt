@@ -18,6 +18,9 @@ class TaskRepositoryImpl @Inject constructor(
 
     @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
     override suspend fun saveTask(task: Task): Task {
+
+        taskStorage.save(task)
+
         if (networkManager.isConnected()) {
             try {
                 return taskStorage.saveToServer(task)
@@ -26,11 +29,11 @@ class TaskRepositoryImpl @Inject constructor(
                 taskStorage.save(taskWithSync)
                 return taskWithSync
             }
-        } else {
-            val taskWithSync = task.copy(needsSync = true)
-            taskStorage.save(taskWithSync)
-            return taskWithSync
         }
+
+        val taskWithSync = task.copy(needsSync = true)
+        taskStorage.save(taskWithSync)
+        return taskWithSync
     }
 
     override fun getAllTasks(): Flow<List<Task>> =
@@ -41,19 +44,23 @@ class TaskRepositoryImpl @Inject constructor(
 
         val task = taskStorage.getTaskById(taskId)
 
-        if (networkManager.isConnected()) {
+        if (networkManager.isConnected() && task != null && task.id > 0) {
+
             try {
                 taskStorage.deleteTaskFromServer(taskId)
             } catch (e: Exception) {
-                task?.let {
+                val markedForDeletion = task.copy(isDeleted = true, needsSync = true)
+                taskStorage.save(markedForDeletion)
+            }
+
+        } else {
+            taskStorage.deleteTask(taskId)
+
+            task?.let {
+                if (it.id > 0) {
                     val markedForDeletion = it.copy(isDeleted = true, needsSync = true)
                     taskStorage.save(markedForDeletion)
                 }
-            }
-        } else {
-            task?.let {
-                val markedForDeletion = it.copy(isDeleted = true, needsSync = true)
-                taskStorage.save(markedForDeletion)
             }
         }
     }
