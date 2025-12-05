@@ -12,10 +12,7 @@ data class TaskEntity(
     val body: String,
     val priority: PriorityData,
     val isCompleted: Boolean = false,
-    val needsSync: Boolean = false,
     val isDeleted: Boolean = false,
-    val lastModified: Long = System.currentTimeMillis(),
-    val createdAt: String? = null,
-    val updatedAt: String? = null
+    val lastModified: Long = System.currentTimeMillis()
 )
 

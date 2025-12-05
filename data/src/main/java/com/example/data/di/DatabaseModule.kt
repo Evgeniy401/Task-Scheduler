@@ -1,9 +1,9 @@
 package com.example.data.di
 
 import android.content.Context
+import com.example.data.storage.database.TaskDatabase
 import com.example.data.storage.dao.StatisticDao
 import com.example.data.storage.dao.TaskDao
-import com.example.data.storage.database.TaskDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,23 +13,29 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DataModule {
+object DatabaseModule {
 
-    @Singleton
     @Provides
-    fun provideTaskDatabase(@ApplicationContext context: Context): TaskDatabase {
+    @Singleton
+    fun provideTaskDatabase(
+        @ApplicationContext context: Context
+    ): TaskDatabase {
         return TaskDatabase.getInstance(context)
     }
 
     @Provides
     @Singleton
-    fun provideTaskDao(database: TaskDatabase): TaskDao {
+    fun provideTaskDao(
+        database: TaskDatabase
+    ): TaskDao {
         return database.taskDao()
     }
 
     @Provides
     @Singleton
-    fun provideStatisticDao(database: TaskDatabase): StatisticDao {
+    fun provideStatisticDao(
+        database: TaskDatabase
+    ): StatisticDao {
         return database.statisticDao()
     }
 }

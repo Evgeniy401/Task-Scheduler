@@ -20,7 +20,6 @@ class TaskDomainUiMapper @Inject constructor() {
                     priorityGroup = getPriorityGroupName(task.priorityDomain),
                     priorityColor = getPriorityColor(task.priorityDomain),
                     isCompleted = task.isCompleted,
-                    needsSync = task.needsSync
                 )
             }
     }

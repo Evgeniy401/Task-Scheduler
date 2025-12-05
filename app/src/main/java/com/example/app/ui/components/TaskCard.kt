@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,7 +33,9 @@ val task1 = Task(
     title = "Помыть машину",
     body = "Это очень длинное описание задачи, которое занимает несколько строк и должно автоматически увеличивать высоту карточки в зависимости от объема текста",
     priorityDomain = PriorityDomain.STANDARD,
-    isCompleted = false
+    isCompleted = false,
+    isDeleted = false,
+    lastModified = System.currentTimeMillis()
 )
 
 @Composable
@@ -44,6 +46,10 @@ fun TaskCard(
     taskMapper: TaskDomainUiMapper,
     onEditTask: (Int) -> Unit,
 ) {
+    if (task.isDeleted) {
+        return
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -81,47 +87,48 @@ fun TaskCard(
             ) {
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+
                     IconButton(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 4.dp),
                         onClick = { onCompleteTask(task.id) },
+                        enabled = !task.isCompleted
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Check,
+                            imageVector = Icons.Default.CheckCircle,
                             contentDescription = "Выполнить задачу",
-                            modifier = Modifier.size(32.dp),
-                            tint = Color.Green
+                            modifier = Modifier.size(30.dp),
+                            tint = if (task.isCompleted) Color.Green else Color.Gray
                         )
                     }
 
+                    Spacer(modifier = Modifier.weight(1f))
+
                     IconButton(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 4.dp),
-                        onClick = { onEditTask(task.id) }
+                        onClick = { onEditTask(task.id) },
+                        enabled = !task.isCompleted
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Редактировать задачу",
-                            modifier = Modifier.size(25.dp),
-                            tint = Color.Blue
+                            modifier = Modifier.size(35.dp),
+                            tint = if (task.isCompleted) Color.Gray else Color.Blue
                         )
                     }
 
+                    Spacer(modifier = Modifier.weight(1f))
+
                     IconButton(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 4.dp),
                         onClick = { onDeleteTask(task.id) }
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Close,
+                            imageVector = Icons.Default.Delete,
                             contentDescription = "Удалить задачу",
-                            modifier = Modifier.size(32.dp),
+                            modifier = Modifier.size(30.dp),
                             tint = Color.Red
                         )
                     }

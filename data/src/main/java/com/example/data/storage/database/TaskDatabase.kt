@@ -15,10 +15,9 @@ import com.example.data.storage.entity.TaskEntity
 
 @Database(
     entities = [TaskEntity::class, StatisticEntity::class],
-    version = 4,
+    version = 5,
     exportSchema = true
 )
-
 @TypeConverters(PriorityDataConverter::class)
 abstract class TaskDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
@@ -30,7 +29,6 @@ abstract class TaskDatabase : RoomDatabase() {
 
         val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
-
                 db.execSQL(
                     """
                     CREATE TABLE IF NOT EXISTS statistics (
@@ -48,14 +46,52 @@ abstract class TaskDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+
+                db.execSQL(
+                    """
+                    CREATE TABLE tasks_new (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        title TEXT NOT NULL,
+                        body TEXT NOT NULL,
+                        priority TEXT NOT NULL,
+                        isCompleted INTEGER NOT NULL DEFAULT 0,
+                        isDeleted INTEGER NOT NULL DEFAULT 0,
+                        lastModified INTEGER NOT NULL DEFAULT 0
+                    )
+                    """.trimIndent()
+                )
+
+                db.execSQL(
+                    """
+                    INSERT INTO tasks_new (id, title, body, priority, isCompleted, isDeleted, lastModified)
+                    SELECT 
+                        id, 
+                        title, 
+                        body, 
+                        priority, 
+                        isCompleted, 
+                        isDeleted,
+                        strftime('%s', 'now') * 1000 AS lastModified
+                    FROM tasks
+                    """.trimIndent()
+                )
+
+                db.execSQL("DROP TABLE tasks")
+                db.execSQL("ALTER TABLE tasks_new RENAME TO tasks")
+            }
+        }
+
         fun getInstance(context: Context): TaskDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    TaskDatabase::class.java,
-                    "task_database"
-                )
-                    .addMigrations(MIGRATION_3_4)
+                                context.applicationContext,
+                                TaskDatabase::class.java,
+                                "task_database"
+                            )
+                                .addMigrations(MIGRATION_3_4, MIGRATION_4_5)
+                    .fallbackToDestructiveMigrationOnDowngrade(false)
                     .build()
                 INSTANCE = instance
                 instance

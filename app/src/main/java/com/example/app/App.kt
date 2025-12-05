@@ -1,7 +1,6 @@
 package com.example.app
 
 import android.app.Application
-import com.example.data.network.NetworkConnectivityObserver
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +12,6 @@ import com.example.domain.repository.StatisticRepository
 class App : Application() {
     @Inject
     lateinit var statisticRepository: StatisticRepository
-    @Inject lateinit var networkConnectivityObserver: NetworkConnectivityObserver
 
     override fun onCreate() {
         super.onCreate()
@@ -21,7 +19,5 @@ class App : Application() {
         CoroutineScope(Dispatchers.IO).launch {
             statisticRepository.initializeStatistics()
         }
-
-        networkConnectivityObserver.startObserving()
     }
 }

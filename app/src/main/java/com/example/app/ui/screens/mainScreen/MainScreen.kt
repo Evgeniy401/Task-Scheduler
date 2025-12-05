@@ -176,7 +176,9 @@ private fun MainScreenState.TaskItem.toDomainTask(): Task {
         title = this.title,
         body = this.body,
         priorityDomain = this.priority,
-        isCompleted = this.isCompleted
+        isCompleted = this.isCompleted,
+        isDeleted = false,
+        lastModified = System.currentTimeMillis()
     )
 }
 
