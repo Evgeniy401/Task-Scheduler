@@ -1,5 +1,6 @@
 package com.example.app.mapping
 
+import android.annotation.SuppressLint
 import com.example.domain.model.StatisticDomainModel
 import com.example.domain.model.StatisticUiModel
 
@@ -20,9 +21,11 @@ object StatisticDomainToUiMapper {
         )
     }
 
+    @SuppressLint("DefaultLocale")
     private fun calculateCompletionPercentage(totalCreated: Int, totalCompleted: Int): Float {
         return if (totalCreated > 0) {
-            (totalCompleted.toFloat() / totalCreated) * 100
+            val percentage = (totalCompleted.toFloat() / totalCreated) * 100
+            String.format("%.2f", percentage).replace(",", ".").toFloat()
         } else {
             0f
         }

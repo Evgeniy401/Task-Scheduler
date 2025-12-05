@@ -19,14 +19,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.app.ui.components.GeneralButton
-import com.example.app.ui.theme.TaskSchedulerTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.material3.CircularProgressIndicator
+import com.example.app.ui.components.GeneralButton
+import com.example.app.ui.components.WarningDialog
+import com.example.app.ui.theme.TaskSchedulerTheme
 
 @Composable
 fun StatisticScreen(
@@ -35,6 +37,13 @@ fun StatisticScreen(
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
+
+    if (uiState.showConfirmationDialog) {
+        ResetConfirmationDialog(
+            onConfirm = { viewModel.confirmReset() },
+            onCancel = { viewModel.cancelReset() }
+        )
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -52,7 +61,7 @@ fun StatisticScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     GeneralButton(
-                        onClick = { viewModel.resetStatistics() }
+                        onClick = { viewModel.showResetConfirmation() }
                     ) {
                         Text(
                             text = "Сбросить статистику",
@@ -96,7 +105,10 @@ fun StatisticScreen(
                     StatRow("Текущих задач", uiState.currentTasks.toString())
                     StatRow("Выполнено", uiState.completedTasks.toString())
                     StatRow("Отменено", uiState.cancelledTasks.toString())
-                    StatRow("Процент выполнения", "${uiState.completionPercentage}%")
+
+                    Spacer(modifier = Modifier.padding(top = 20.dp))
+
+                    StatRow("Процент выполнения ", "${uiState.completionPercentage}%")
                 }
             }
         }
@@ -118,6 +130,22 @@ fun StatRow(label: String, value: String) {
             style = MaterialTheme.typography.headlineSmall
         )
     }
+}
+
+@Composable
+private fun ResetConfirmationDialog(
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit
+) {
+    WarningDialog(
+        title = "Сброс статистики",
+        message = "Вы уверены, что хотите сбросить всю статистику? Это действие невозможно отменить.",
+        confirmButtonText = "Сбросить",
+        cancelButtonText = "Отмена",
+        onConfirm = onConfirm,
+        onCancel = onCancel,
+        onDismiss = onCancel
+    )
 }
 
 @Preview(showBackground = true, showSystemUi = true)
