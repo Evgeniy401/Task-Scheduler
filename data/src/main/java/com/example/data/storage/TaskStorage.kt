@@ -9,4 +9,5 @@ interface TaskStorage {
     suspend fun deleteTask(taskId: Int)
     suspend fun completeTask(taskId: Int)
     suspend fun getTaskById(taskId: Int): Task?
+    fun getActiveTasks(): Flow<List<Task>>
 }

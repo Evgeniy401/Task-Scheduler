@@ -1,4 +1,5 @@
 package com.example.domain.usecase
+
 import com.example.domain.repository.StatisticRepository
 import com.example.domain.repository.TaskRepository
 import javax.inject.Inject
