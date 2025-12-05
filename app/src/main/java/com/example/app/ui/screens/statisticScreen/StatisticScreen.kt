@@ -35,13 +35,17 @@ fun StatisticScreen(
     onBack: () -> Unit,
     viewModel: StatisticViewModel = hiltViewModel()
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
 
     if (uiState.showConfirmationDialog) {
-        ResetConfirmationDialog(
+        WarningDialog(
+            title = "Сброс статистики",
+            message = "Вы уверены, что хотите сбросить всю статистику? Это действие невозможно отменить.",
+            confirmButtonText = "Сбросить",
+            cancelButtonText = "Отмена",
             onConfirm = { viewModel.confirmReset() },
-            onCancel = { viewModel.cancelReset() }
+            onCancel = { viewModel.cancelReset() },
+            onDismiss = { viewModel.cancelReset() }
         )
     }
 

@@ -8,12 +8,15 @@ class CompleteTaskUseCase @Inject constructor(
     private val statisticRepository: StatisticRepository
 ) {
     suspend operator fun invoke(taskId: Int) {
-
         val task = repository.getTaskById(taskId)
 
         if (task != null && !task.isCompleted) {
             statisticRepository.incrementTotalCompleted()
-            repository.completeTask(taskId)
+            val completedTask = task.copy(
+                isCompleted = true,
+                lastModified = System.currentTimeMillis()
+            )
+            repository.saveTask(completedTask)
         }
     }
 }

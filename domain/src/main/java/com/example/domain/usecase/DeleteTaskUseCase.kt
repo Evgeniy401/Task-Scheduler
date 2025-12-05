@@ -10,6 +10,14 @@ class DeleteTaskUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(taskId: Int) {
         statisticRepository.incrementTotalDeleted()
-        repository.deleteTask(taskId)
+
+        val task = repository.getTaskById(taskId)
+        if (task != null) {
+            val deletedTask = task.copy(
+                isDeleted = true,
+                lastModified = System.currentTimeMillis()
+            )
+            repository.saveTask(deletedTask)
+        }
     }
 }
