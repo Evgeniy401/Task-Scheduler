@@ -8,18 +8,17 @@ data class Task(
     val isCompleted: Boolean = false,
     val isDeleted: Boolean = false,
     val lastModified: Long = System.currentTimeMillis()
-) {
-    fun getPriorityValue(): Int {
-        return when (priorityDomain) {
-            PriorityDomain.MAXIMUM -> 4
-            PriorityDomain.HIGH -> 3
-            PriorityDomain.STANDARD -> 2
-            PriorityDomain.NONE -> 1
+)
+
+enum class PriorityDomain(val value: Int) {
+    NONE(1),
+    STANDARD(2),
+    HIGH(3),
+    MAXIMUM(4);
+
+    companion object {
+        fun fromValue(value: Int): PriorityDomain {
+            return entries.firstOrNull { it.value == value } ?: NONE
         }
     }
 }
-
-enum class PriorityDomain {
-    STANDARD, HIGH, MAXIMUM, NONE;
-}
-

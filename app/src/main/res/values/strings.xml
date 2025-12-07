@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Task Scheduler</string>
+    <string name="app_name">Задачи</string>
     <string name="priority_none">не выбрано</string>
     <string name="priority_standard">Стандартный</string>
     <string name="priority_high">Высокий</string>

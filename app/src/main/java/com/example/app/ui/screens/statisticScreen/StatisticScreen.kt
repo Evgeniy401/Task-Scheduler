@@ -26,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.text.font.FontWeight
 import com.example.app.ui.components.GeneralButton
 import com.example.app.ui.components.WarningDialog
 import com.example.app.ui.theme.TaskSchedulerTheme
@@ -127,11 +128,17 @@ fun StatRow(label: String, value: String) {
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
         )
     }
 }

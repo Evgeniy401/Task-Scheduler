@@ -30,6 +30,8 @@ import com.example.app.ui.components.GeneralButton
 import com.example.app.ui.components.TaskCard
 import com.example.app.ui.components.WarningDialog
 import com.example.app.ui.theme.TaskSchedulerTheme
+import com.example.app.ui.theme.TextButton
+import com.example.app.ui.utils.PriorityUtils
 import com.example.domain.model.Task
 
 @Composable
@@ -110,10 +112,15 @@ private fun ButtonsColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         GeneralButton(onClick = onNewTask) {
-            Text(text = "Новая задача", fontSize = 20.sp)
+            Text(text = "Новая задача",
+                fontSize = 20.sp,
+                color = TextButton)
         }
         GeneralButton(onClick = onStatistics) {
-            Text(text = "Статистика", fontSize = 20.sp)
+            Text(text = "Статистика",
+                fontSize = 20.sp,
+                color = TextButton
+            )
         }
     }
 }
@@ -142,18 +149,27 @@ private fun TaskList(
     onEditTask: (Int) -> Unit = {},
     taskMapper: TaskDomainUiMapper
 ) {
-    val groupedTasks = remember(tasks) {
-        tasks.groupBy { it.priorityGroup }
+
+    val groupedAndSortedTasks = remember(tasks) {
+        val sortedTasks = tasks.sortedByDescending { task ->
+            PriorityUtils.getPriorityValue(task.priorityGroup)
+        }
+
+        sortedTasks
+            .groupBy { it.priorityGroup }
+            .toSortedMap(Comparator { group1, group2 ->
+                PriorityUtils.comparePriorities(group1, group2)
+            })
     }
 
     LazyColumn(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        groupedTasks.forEach { (priorityGroup, tasksInGroup) ->
+        groupedAndSortedTasks.forEach { (priorityGroup, tasksInGroup) ->
             item {
                 PriorityHeader(
-                    title = priorityGroup,
+                    title = "$priorityGroup приоритет",
                     priorityColor = tasksInGroup.firstOrNull()?.priorityColor ?: Color.Gray
                 )
             }
@@ -163,7 +179,6 @@ private fun TaskList(
                     onCompleteTask = onCompleteTask,
                     onDeleteTask = onDeleteTask,
                     onEditTask = onEditTask,
-                    taskMapper = taskMapper
                 )
             }
         }
@@ -192,6 +207,7 @@ private fun PriorityHeader(
         style = MaterialTheme.typography.titleMedium,
         color = priorityColor,
         textAlign = TextAlign.Center,
+        fontSize = 25.sp,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -206,7 +222,6 @@ fun MainScreenPreview() {
             onNavigateToStatistic = {},
             onNavigateToWindowNewTask = {},
             onNavigateToEditTask = {}
-            // мок маппер
         )
     }
 }
