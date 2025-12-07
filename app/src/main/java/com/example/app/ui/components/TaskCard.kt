@@ -15,16 +15,18 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
-import com.example.app.mapping.TaskDomainUiMapper
+import com.example.app.ui.theme.DeleteColor
+import com.example.app.ui.theme.EditColor
+import com.example.app.ui.theme.ExecuteColor
+import com.example.app.ui.theme.TextButton
 import com.example.domain.model.PriorityDomain
 import com.example.domain.model.Task
 
@@ -43,7 +45,6 @@ fun TaskCard(
     task: Task,
     onCompleteTask: (Int) -> Unit,
     onDeleteTask: (Int) -> Unit,
-    taskMapper: TaskDomainUiMapper,
     onEditTask: (Int) -> Unit,
 ) {
     if (task.isDeleted) {
@@ -53,100 +54,93 @@ fun TaskCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
-            containerColor = taskMapper.getTaskCardColor(task.priorityDomain)
+            containerColor = MaterialTheme.colorScheme.surface,
         )
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+
             Text(
                 text = task.title,
                 style = MaterialTheme.typography.headlineSmall,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
             )
 
             Text(
                 modifier = Modifier
-                    .padding(horizontal = 5.dp),
+                    .fillMaxWidth(),
                 text = task.body,
                 textAlign = TextAlign.Justify,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Black
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.secondary,
             )
 
-            Column(
+            Row(
                 modifier = Modifier
-                    .padding(bottom = 8.dp, top = 3.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
+                IconButton(
+                    onClick = { onCompleteTask(task.id) },
+                    enabled = !task.isCompleted,
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = ExecuteColor,
+                        disabledContentColor = TextButton
+                    )
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = "Выполнить задачу",
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
 
-                    IconButton(
-                        onClick = { onCompleteTask(task.id) },
-                        enabled = !task.isCompleted
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = "Выполнить задачу",
-                            modifier = Modifier.size(30.dp),
-                            tint = if (task.isCompleted) Color.Green else Color.Gray
-                        )
-                    }
+                Spacer(modifier = Modifier.weight(1f))
 
-                    Spacer(modifier = Modifier.weight(1f))
+                IconButton(
+                    onClick = { onEditTask(task.id) },
+                    enabled = !task.isCompleted,
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = EditColor,
+                        disabledContentColor = TextButton
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Редактировать задачу",
+                        modifier = Modifier.size(35.dp)
+                    )
+                }
 
-                    IconButton(
-                        onClick = { onEditTask(task.id) },
-                        enabled = !task.isCompleted
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Редактировать задачу",
-                            modifier = Modifier.size(35.dp),
-                            tint = if (task.isCompleted) Color.Gray else Color.Blue
-                        )
-                    }
+                Spacer(modifier = Modifier.weight(1f))
 
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    IconButton(
-                        onClick = { onDeleteTask(task.id) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Удалить задачу",
-                            modifier = Modifier.size(30.dp),
-                            tint = Color.Red
-                        )
-                    }
+                IconButton(
+                    onClick = { onDeleteTask(task.id) },
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = DeleteColor,
+                        disabledContentColor = TextButton
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Удалить задачу",
+                        modifier = Modifier.size(30.dp)
+                    )
                 }
             }
         }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun CompletedTaskCardPreview() {
-    val completedTask = task1.copy(isCompleted = true)
-    TaskCard(
-        task = completedTask,
-        onCompleteTask = {},
-        onDeleteTask = {},
-        taskMapper = TaskDomainUiMapper(),
-        onEditTask = {},
-    )
 }

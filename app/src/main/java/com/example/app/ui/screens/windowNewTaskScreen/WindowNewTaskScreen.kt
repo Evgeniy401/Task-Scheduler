@@ -1,5 +1,6 @@
 package com.example.app.ui.screens.windowNewTaskScreen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -71,9 +73,11 @@ fun WindowNewTaskScreen(
                 is WindowNewTaskScreenViewModel.NavigationEvent.NavigateBack -> {
                     onBack()
                 }
+
                 is WindowNewTaskScreenViewModel.NavigationEvent.ShowValidationError -> {
                     snackbarHostState.showSnackbar("Заполните название задачи")
                 }
+
                 is WindowNewTaskScreenViewModel.NavigationEvent.ShowError -> {
                     snackbarHostState.showSnackbar(event.message)
                 }
@@ -195,7 +199,10 @@ fun WindowNewTaskScreen(
                             shape = RoundedCornerShape(10.dp),
                         ) {
                             Text(
-                                text = getPriorityText(uiState.selectedPriority, includePrefix = true)
+                                text = getPriorityText(
+                                    uiState.selectedPriority,
+                                    includePrefix = true
+                                )
                             )
                             Icon(
                                 imageVector = if (isExpanded) Icons.Default.ArrowDropUp
@@ -205,7 +212,10 @@ fun WindowNewTaskScreen(
                         }
                         DropdownMenu(
                             expanded = isExpanded,
-                            onDismissRequest = { isExpanded = false }
+                            onDismissRequest = { isExpanded = false },
+                            modifier = Modifier.background(
+                                color = MaterialTheme.colorScheme.surfaceVariant
+                            )
                         ) {
                             priorities.forEach { priority ->
                                 DropdownMenuItem(
@@ -218,6 +228,7 @@ fun WindowNewTaskScreen(
                                             text = getPriorityText(priority, includePrefix = false),
                                             textAlign = TextAlign.Center,
                                             modifier = Modifier.fillMaxWidth(),
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
                                 )

@@ -7,4 +7,32 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="text_button">#ECE9F4</color>
+
+    <color name="background_dt">#181124</color>
+    <color name="background_lt">#ECE9F4</color>
+    <color name="button_dt">#514596</color>
+    <color name="button_lt">#514596</color>
+    <color name="priority_list_max_dt">#E72263</color>
+    <color name="priority_list_max_lt">#E72263</color>
+
+    <color name="priority_list_high_dt">#AF66A6</color>
+    <color name="priority_list_high_lt">#AF66A6</color>
+
+    <color name="priority_list_stand_dt">#FF018786</color>
+    <color name="priority_list_stand_lt">#FF000000</color>
+
+    <color name="execute_dt">#52BDC5</color>
+    <color name="execute_lt">#52BDC5</color>
+    <color name="delete_dt">#E72263</color>
+    <color name="delete_lt">#E72263</color>
+    <color name="edit_dt">#514596</color>
+    <color name="edit_lt">#514596</color>
+
+    <color name="text_title_dt">#ECE9F4</color>
+    <color name="text_title_lt">#FF000000</color>
+    <color name="text_body_dt">#7A6F9B</color>
+    <color name="text_body_lt">#9788B7</color>
+
 </resources>
